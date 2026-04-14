@@ -1,8 +1,66 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux'
+import { loginUser } from '../../redux/features/authSlice';
 
 const Login = () => {
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const [showPassword, setShowPassword] = useState(false);
+
+  const [form, setForm] = useState({
+    email: "",
+    password: ""
+  })
+
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const validateForm = () => {
+    if (!form.email.includes("@")) {
+      return "Invalid email format"
+    }
+
+    if (!form.password) {
+      return "Password is required"
+    }
+
+    return null
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    const validationError = validateForm()
+
+    if (validationError) {
+      setError(validationError)
+      return
+    }
+
+    try {
+      setLoading(true)
+console.log("login1111111111111111111111111111")
+      const resultAction = await dispatch(loginUser(form))
+      if (loginUser.fulfilled.match(resultAction)) {
+        console.log(resultAction,'result88888888888888888888888888888')
+        navigate("/home")
+      } else {
+        setError(resultAction.payload || "Login failed")
+      }
+    } catch (error) {
+      // Network error
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -53,11 +111,19 @@ const Login = () => {
             </div>
           </div> */}
 
-          {/* Email */}
+          {error && (
+            <p className="text-red-500 text-xs text-center mb-4">{error}</p>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            {/* Email */}
           <div className="flex flex-col gap-1 mb-4">
             <label className="text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
+              name='email'
+              value={form.email}
+              onChange={handleChange}
               placeholder="Enter your Email"
               className="w-full px-4 py-3 rounded-full border border-blue-300 outline-none focus:ring-2 focus:ring-blue-400 text-sm transition"
             />
@@ -69,6 +135,9 @@ const Login = () => {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
+                name='password'
+                value={form.password}
+                onChange={handleChange}
                 placeholder="Enter your Password"
                 className="w-full px-4 py-3 rounded-full border border-blue-300 outline-none focus:ring-2 focus:ring-blue-400 text-sm pr-12 transition"
               />
@@ -99,9 +168,13 @@ const Login = () => {
           </div>
 
           {/* Login Button */}
-          <button className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold py-3 rounded-full shadow-md shadow-blue-200 transition-all duration-200">
-            Login
-          </button>
+            <button
+              type='submit'
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold py-3 rounded-full shadow-md shadow-blue-200 transition-all duration-200">
+              {loading ? "Logging in..." : "Login"}
+            </button>
+          </form>
 
           {/* Divider */}
           <div className="flex items-center gap-3 my-6">

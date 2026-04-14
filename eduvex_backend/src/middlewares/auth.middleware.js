@@ -5,9 +5,10 @@ export const protect = (req, res, next) => {
         const token = req.cookies.token;
         console.log(token, 'cookie token')
         if (!token) {
+            console.log('No token')
             return res.status(401).json({ message: "Not authorized" });
         }
-
+        console.log('yes token')
         const decode = jwt.verify(token, process.env.JWT_SECRET);
         console.log(decode,'decode')
         req.user = decode.id;

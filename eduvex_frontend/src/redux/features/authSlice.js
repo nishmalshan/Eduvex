@@ -7,12 +7,27 @@ const initialState = {
     isAuthenticated: false,
 };
 
+const saveAuthToStorage = (user, token) => {
+    if (user) {
+        localStorage.setItem("authUser", JSON.stringify(user));
+    }
+    if (token) {
+        localStorage.setItem("authToken", token);
+    }
+};
+
+const clearAuthStorage = () => {
+    localStorage.removeItem("authUser");
+    localStorage.removeItem("authToken");
+};
+
 // Async thunk for signup 
 export const registerUser = createAsyncThunk(
     "auth/registerUser",
     async (formData, thunkAPI) => {
         try {
             const response = await API_URL.post("/signup", formData);
+            console.log(response,'slice response')
             return response.data
         } catch (error) {
             return thunkAPI.rejectWithValue(
@@ -22,40 +37,81 @@ export const registerUser = createAsyncThunk(
     }
 )
 
+// Async thunk for login
+export const loginUser = createAsyncThunk(
+    "auth/loginUser",
+    async (formData, { rejectWithValue }) => {
+        try {
+            const response = await API_URL.post("/login", formData)
+            console.log(response, 'login slice response')
+            return response.data
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Login failed"
+            )
+        }
+    }
+)
+
+
+// Async thunk for logout user
+export const logoutUser = createAsyncThunk(
+    "auth/logoutUser",
+    async () => {
+        await API_URL.post("/logout")
+    }
+);
+
 const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
         loginSuccess: (state, action) => {
-            state.user = action.payload;
+            console.log(state, 'state')
+            console.log(action, 'action')
+            state.user = action.payload.user;
+            state.token = action.payload.token || null;
             state.isAuthenticated = true;
+            saveAuthToStorage(action.payload.user, action.payload.token);
         },
         logout: (state) => {
             state.user = null;
             state.token = null;
             state.isAuthenticated = false;
+            clearAuthStorage();
         }
     },
     extraReducers: (builder) => {
         builder
 
-            // Loading 
+            // Signup
             .addCase(registerUser.pending, (state) => {
-                state.loading = true;
-                state.error = null;
+                state.loading = true
+                state.error = null
             })
+
             .addCase(registerUser.fulfilled, (state, action) => {
-                state.loading = false;
-                state.user = action.payload.user;
-                // state.token = action.payload.token;
-                state.isAuthenticated = true;
-                console.log(action, 'action')
-                // store token
-                // localStorage.setItem("token", action.payload.token)
+                state.loading = false
+                state.user = action.payload.user
+                state.token = action.payload.token || null
+                state.isAuthenticated = true
+                saveAuthToStorage(action.payload.user, action.payload.token)
             })
-            .addCase(registerUser.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload;
+
+            // Login
+            .addCase(loginUser.fulfilled, (state, action) => {
+                state.user = action.payload.user
+                state.token = action.payload.token || null
+                state.isAuthenticated = true
+                saveAuthToStorage(action.payload.user, action.payload.token)
+            })
+
+            // Logout
+            .addCase(logoutUser.fulfilled, (state) => {
+                state.user = null
+                state.token = null
+                state.isAuthenticated = false
+                clearAuthStorage();
             })
     }
 });

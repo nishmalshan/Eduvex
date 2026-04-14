@@ -1,12 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Menu, X, Bell, ShoppingCart, User, LogOut, ChevronDown, Glasses } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from '../../redux/features/authSlice';
 
 const HomeNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
   const profileRef = useRef(null);
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
@@ -21,6 +26,15 @@ const HomeNavbar = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+
+    // if (logoutUser.fulfilled.match) {
+      
+    // }
+    navigate("/login")
+  }
 
   return (
     <nav className="bg-white shadow-md fixed w-full top-0 z-50">
@@ -113,7 +127,7 @@ const HomeNavbar = () => {
                   <div className="border-t border-gray-100 my-1"></div>
                   <button
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
-                    onClick={() => { setIsProfileOpen(false); /* handle logout */ }}
+                    onClick={handleLogout}
                   >
                     <LogOut className="w-4 h-4" />
                     Logout
@@ -207,7 +221,7 @@ const HomeNavbar = () => {
             </Link>
             <button
               className="w-full flex items-center gap-3 px-4 py-2 text-red-500 hover:bg-red-50 rounded-lg font-medium transition-colors"
-              onClick={() => { toggleMenu(); /* handle logout */ }}
+              onClick={handleLogout}
             >
               <LogOut className="w-4 h-4" />
               Logout
