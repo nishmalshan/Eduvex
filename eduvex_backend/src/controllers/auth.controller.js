@@ -12,7 +12,7 @@ console.log(result.token,'tokeeeeeeeeeeeeeeeeeeeee')
 console.log(result.u)
 res.cookie("token", result.token, {
     httpOnly: true,
-    secure: false,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     maxAge: 7 * 24 * 60 * 60 * 1000
 });
@@ -22,7 +22,8 @@ res.cookie("token", result.token, {
             user: {
                 id: result.newUser._id,
                 fullName: result.newUser.fullName,
-                email: result.newUser.email
+                email: result.newUser.email,
+                isBlocked: result.newUser.isBlocked
             },
             token: result.token
         })
@@ -33,11 +34,9 @@ res.cookie("token", result.token, {
 
 export const checkAuth = (req, res) => {
     try {
-        console.log('checkkkkkkkkkkkkkkkkkkkk')
         if (!req.user) {
             return res.status(401).json({ message: "Unauthorized" });
         }
-        console.log(req.user,'req.userrrrrr')
 console.log(req.user)
         res.json({
             user: req.user
@@ -49,16 +48,21 @@ console.log(req.user)
 
 export const loginUser = async (req, res) => {
     try {
-        console.log("login2222222222222222222222222")
         const { email, password } = req.body;
 
         const result = await loginService({ email, password });
         console.log(result,'login result')
-        console.log("login6666666666666666666666666666")
-        res.status(200).json({ success: true, user: result.user, token: result.token });
+        const { password: _, ...user } = result.user.toObject();
+
+        res.cookie("token", result.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+        res.status(200).json({ success: true, user, token: result.token });
 
     } catch (error) {
-        console.log('tttttttttttttttttttt')
         res.status(400).json({ success: false, message: error.message });
     }
 }

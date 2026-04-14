@@ -7,18 +7,14 @@ const initialState = {
     isAuthenticated: false,
 };
 
-const saveAuthToStorage = (user, token) => {
+const saveAuthToStorage = (user) => {
     if (user) {
         localStorage.setItem("authUser", JSON.stringify(user));
-    }
-    if (token) {
-        localStorage.setItem("authToken", token);
     }
 };
 
 const clearAuthStorage = () => {
     localStorage.removeItem("authUser");
-    localStorage.removeItem("authToken");
 };
 
 // Async thunk for signup 
@@ -27,7 +23,7 @@ export const registerUser = createAsyncThunk(
     async (formData, thunkAPI) => {
         try {
             const response = await API_URL.post("/signup", formData);
-            console.log(response,'slice response')
+            console.log(response.data,'register slice response')
             return response.data
         } catch (error) {
             return thunkAPI.rejectWithValue(
@@ -43,7 +39,7 @@ export const loginUser = createAsyncThunk(
     async (formData, { rejectWithValue }) => {
         try {
             const response = await API_URL.post("/login", formData)
-            console.log(response, 'login slice response')
+            console.log(response.data, 'login slice response')
             return response.data
         } catch (error) {
             return rejectWithValue(
@@ -67,12 +63,11 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         loginSuccess: (state, action) => {
-            console.log(state, 'state')
-            console.log(action, 'action')
+            console.log(action, 'login success action')
             state.user = action.payload.user;
             state.token = action.payload.token || null;
             state.isAuthenticated = true;
-            saveAuthToStorage(action.payload.user, action.payload.token);
+            saveAuthToStorage(action.payload.user);
         },
         logout: (state) => {
             state.user = null;
@@ -91,11 +86,12 @@ const authSlice = createSlice({
             })
 
             .addCase(registerUser.fulfilled, (state, action) => {
+                console.log(action,'register action')
                 state.loading = false
                 state.user = action.payload.user
                 state.token = action.payload.token || null
                 state.isAuthenticated = true
-                saveAuthToStorage(action.payload.user, action.payload.token)
+                saveAuthToStorage(action.payload.user)
             })
 
             // Login
@@ -103,7 +99,7 @@ const authSlice = createSlice({
                 state.user = action.payload.user
                 state.token = action.payload.token || null
                 state.isAuthenticated = true
-                saveAuthToStorage(action.payload.user, action.payload.token)
+                saveAuthToStorage(action.payload.user)
             })
 
             // Logout

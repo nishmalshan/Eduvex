@@ -52,19 +52,18 @@ const SignUp = () => {
       setError(validationError)
       return
     }
-console.log('1111111111111111111111111111')
+
     try {
-      console.log('22222222222222222222222222')
+
       setLoading(true);
-      console.log('3333333333333333333333333')
+
       const resultAction = await dispatch(registerUser(form));
 
       if (registerUser.fulfilled.match(resultAction)) {
-        navigate("/home")
+        navigate("/")
       } else {
         setError(resultAction.payload || "Signup failed")
       }
-console.log(resultAction,'444444444444444444444444444444')
 
     } catch (error) {
       // Network error

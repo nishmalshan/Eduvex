@@ -41,6 +41,7 @@ console.log(newUser,'66666666666')
 
 export const loginService = async ({ email, password }) => {
     try {
+        console.log(email, password)
         console.log("login3333333333333333333333333")
         const user = await findUserByEmail(email);
 

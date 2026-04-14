@@ -46,11 +46,10 @@ const Login = () => {
 
     try {
       setLoading(true)
-console.log("login1111111111111111111111111111")
+
       const resultAction = await dispatch(loginUser(form))
       if (loginUser.fulfilled.match(resultAction)) {
-        console.log(resultAction,'result88888888888888888888888888888')
-        navigate("/home")
+        navigate("/")
       } else {
         setError(resultAction.payload || "Login failed")
       }
