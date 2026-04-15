@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search, Menu, X, Bell, ShoppingCart, User, LogOut, ChevronDown, Glasses } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { logoutUser } from '../../redux/features/authSlice';
+import { logoutUser } from '../../../redux/features/authSlice';
 
 const HomeNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

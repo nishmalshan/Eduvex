@@ -1,4 +1,6 @@
-function BecomeTutorSection() {
+import React from 'react'
+
+const BecomeTutorSection = () => {
   return (
     <section className="bg-gray-50 min-h-screen flex items-center justify-center p-8">
       <div
@@ -47,6 +49,8 @@ function BecomeTutorSection() {
     </section>
   );
 }
+
+
 
 function GraduationCap() {
   return (

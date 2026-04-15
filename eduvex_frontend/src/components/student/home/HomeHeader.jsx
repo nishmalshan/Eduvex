@@ -1,5 +1,5 @@
 import React from 'react';
-import heroImage from "../../assets/images/nick-pampoukidis-z1r-RwAM72w-unsplash.jpg"
+import heroImage from "../../../assets/images/nick-pampoukidis-z1r-RwAM72w-unsplash.jpg"
 
 const Header = () => {
   return (
