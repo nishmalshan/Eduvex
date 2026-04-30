@@ -1,21 +1,20 @@
-import { registerUser, loginService } from "../services/auth.service.js";
+import { registerUserService, loginService, googleAuthService } from "../services/auth.service.js";
+import jwt from "jsonwebtoken";
+import { generateToken } from "../utils/generateToken.js";
 
 
 export const signup = async (req, res) => {
     try {
         const { fullName, email, password } = req.body;
-        console.log(req.body, 'req.body11111')
-        
-        const result = await registerUser({ fullName, email, password});
-console.log(result,'reg user result')
-console.log(result.token,'tokeeeeeeeeeeeeeeeeeeeee')
-console.log(result.u)
-res.cookie("token", result.token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000
-});
+
+        const result = await registerUserService({ fullName, email, password });
+
+        res.cookie("token", result.token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
 
         res.status(201).json({
             success: true,
@@ -37,7 +36,7 @@ export const checkAuth = (req, res) => {
         if (!req.user) {
             return res.status(401).json({ message: "Unauthorized" });
         }
-console.log(req.user)
+
         res.json({
             user: req.user
         });
@@ -51,7 +50,6 @@ export const loginUser = async (req, res) => {
         const { email, password } = req.body;
 
         const result = await loginService({ email, password });
-        console.log(result,'login result')
         const { password: _, ...user } = result.user.toObject();
 
         res.cookie("token", result.token, {
@@ -82,5 +80,34 @@ export const logoutUser = async (req, res) => {
         })
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+
+export const googleAuthCallback = async (req, res) => {
+    try {
+        const googleId = req.user.id;
+        const email = req.user.emails[0].value;
+        const fullName = req.user.displayName;
+
+        const result = await googleAuthService({ googleId, email, fullName });
+        console.log(result,'result')
+        
+        // Generate JWT
+        const token = generateToken(result.user._id);
+        
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+
+
+        res.redirect(`http://localhost:5173/google-success?token=${token}&id=${result.user._id}&name=${result.user.fullName}&email=${result.user.email}&isBlocked=${result.user.isBlocked}`);
+    } catch (error) {
+        res.status(500).json({
+            message: "Google authentication failed"
+        });
     }
 }

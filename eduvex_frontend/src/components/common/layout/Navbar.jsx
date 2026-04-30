@@ -15,7 +15,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <h1 className="text-2xl font-bold text-blue-600">EDUVEX</h1>
+            <h1 className="text-2xl font-bold text-blue-800">EDUVEX</h1>
           </div>
 
           {/* Desktop Search Bar */}
@@ -29,26 +29,26 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6 text-sm">
-            <a href="#explore" className="text-gray-500 hover:text-blue-600 font-semibold transition-colors">
+            <a href="#explore" className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
               Explore
             </a>
-            <a href="#about" className="text-gray-500 hover:text-blue-600 font-semibold transition-colors">
+            <a href="#about" className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
               About us
             </a>
-            <a href="#contact" className="text-gray-500 hover:text-blue-600 font-semibold transition-colors">
+            <a href="#contact" className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
               Contact
             </a>
           </div>
           <div className="hidden md:flex items-center space-x-6 text-sm">
-            <Link to="/login" className='text-blue-600 hover:text-blue-700 font-semibold transition-colors'>Login</Link>
-            <Link to="/signup" className='bg-blue-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-blue-700 font-medium transition-colors'>Sign up</Link>
+            <Link to="/login" className='text-blue-800 hover:text-blue-700 font-medium transition-colors'>Login</Link>
+            <Link to="/signup" className='bg-blue-800 text-white px-6 py-2 rounded-full font-medium hover:bg-blue-700 font-medium transition-colors'>Sign up</Link>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="text-gray-700 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg p-2"
+              className="text-gray-700 hover:text-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg p-2"
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -77,21 +77,21 @@ const Navbar = () => {
         <div className="px-4 pt-2 pb-4 space-y-3 bg-white border-t border-gray-200">
           <a
             href="#explore"
-            className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg font-medium transition-colors"
+            className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-800 rounded-lg font-medium transition-colors"
             onClick={toggleMenu}
           >
             Explore
           </a>
           <a
             href="#about"
-            className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg font-medium transition-colors"
+            className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-800 rounded-lg font-medium transition-colors"
             onClick={toggleMenu}
           >
             About us
           </a>
           <a
             href="#contact"
-            className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-lg font-medium transition-colors"
+            className="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-800 rounded-lg font-medium transition-colors"
             onClick={toggleMenu}
           >
             Contact
@@ -99,14 +99,14 @@ const Navbar = () => {
           <div className="border-t border-gray-200 pt-3 space-y-2">
             <a
               href="#login"
-              className="block px-4 py-2 text-center text-blue-600 border border-blue-600 rounded-full hover:bg-blue-50 font-medium transition-colors"
+              className="block px-4 py-2 text-center text-blue-800 border border-blue-800 rounded-full hover:bg-blue-50 font-medium transition-colors"
               onClick={toggleMenu}
             >
               Log in
             </a>
             <a
               href="#signup"
-              className="block px-4 py-2 text-center bg-blue-600 text-white rounded-full hover:bg-blue-700 font-medium transition-colors"
+              className="block px-4 py-2 text-center bg-blue-800 text-white rounded-full hover:bg-blue-700 font-medium transition-colors"
               onClick={toggleMenu}
             >
               Sign up

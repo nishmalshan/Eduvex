@@ -1,37 +1,31 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { findUserByEmail, createUser } from "../repositories/user.repository.js";
+import { findUserByEmail, createUser, findUserByGoogleId } from "../repositories/user.repository.js";
+import { generateToken } from "../utils/generateToken.js"
 
 
-export const registerUser = async ({ fullName, email, password }) => {
+export const registerUserService = async ({ fullName, email, password }) => {
     try {
-        console.log(fullName, email, password,'33333333')
-    const user = await findUserByEmail(email);
-    console.log(user,'444444444')
-    if (user) {
-        throw new Error("User already exists");
-    }
+        const user = await findUserByEmail(email);
+        if (user) {
+            throw new Error("User already exists");
+        }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashpassword = await bcrypt.hash(password, salt);
-console.log(hashpassword,'55555555')
-    // Create User
-    const newUser = await createUser({
-        fullName,
-        email,
-        password: hashpassword
-    })
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashpassword = await bcrypt.hash(password, salt);
 
-console.log(newUser,'66666666666')
-    // Generate JWT
-    const token = jwt.sign(
-        { id: newUser._id },
-        process.env.JWT_SECRET,
-        { expiresIn: "7d"}
-    );
+        // Create User
+        const newUser = await createUser({
+            fullName,
+            email,
+            password: hashpassword
+        })
 
-    return { newUser, token}
+        // Generate JWT
+        const token = generateToken(newUser._id);
+
+        return { newUser, token }
 
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
@@ -41,8 +35,6 @@ console.log(newUser,'66666666666')
 
 export const loginService = async ({ email, password }) => {
     try {
-        console.log(email, password)
-        console.log("login3333333333333333333333333")
         const user = await findUserByEmail(email);
 
         if (!user) {
@@ -50,20 +42,52 @@ export const loginService = async ({ email, password }) => {
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
-console.log("login444444444444444444444444444444444")
         if (!isMatch) {
             throw new Error("Invalid credentials");
         }
 
-        const token = jwt.sign(
-            { id: user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-        )
-console.log("login55555555555555555555555555555555555")
+        // Generate JWT
+        const token = generateToken(newUser._id);
+
         return { user, token }
 
     } catch (error) {
         throw new Error(error.message);
+    }
+}
+
+export const googleAuthService = async (data) => {
+    try {
+        console.log(data,'data')
+        let user;
+
+        // Check user with googleId
+        user = await findUserByGoogleId(data.googleId);
+        console.log('2222222222222222')
+        console.log(user, 'findUserByGoogleId result')
+
+        // If not found check with email
+        if (!user) {
+            user = await findUserByEmail(data.email);
+            console.log(user, 'findByEmail result')
+            // User exists with email signup
+            if (user) {
+                user.googleId = data.googleId;
+                await user.save();
+            }
+        }
+
+        if (!user) {
+            const newUser = await createUser({
+                googleId: data.googleId,
+                fullName: data.fullName,
+                email: data.email
+            });
+            return { user: newUser };
+        }
+
+        return { user };
+    } catch (error) {
+
     }
 }

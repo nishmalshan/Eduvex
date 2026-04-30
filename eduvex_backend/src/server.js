@@ -1,15 +1,16 @@
-import express from "express"
 import dotenv from "dotenv"
+dotenv.config()
+import "./config/passport.js";
+
+import express from "express"
 import cookieParser from "cookie-parser"
 import authRoutes from "./routes/auth.routes.js"
 import connectDB from "./config/db.js"
 import cors from "cors";
-
-dotenv.config()
+import passport from "passport"
 connectDB()
 
 const app = express()
-
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -19,6 +20,8 @@ app.use(
 
 app.use(cookieParser())
 app.use(express.json());
+app.use(passport.initialize());
+
 app.use("/", authRoutes)
 
 

@@ -34,10 +34,10 @@ const SignUp = () => {
       return "Password must contain at least one uppercase letter"
     }
 
-    if (!/[0-9]/.test(form.password)) {
+    if (!/[!@#$%^&*]/.test(form.password)) {
       return "Password must contain at least one special character"
     }
-    
+
     return null
   }
 
@@ -70,6 +70,15 @@ const SignUp = () => {
       setError("Network error. Please try again.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  const handleGoogleSignIn = () => {
+    try {
+      console.log('1111111111111111111')
+      window.location.href = "http://localhost:5000/auth/google";
+    } catch (error) {
+      setError("Google sign-up failed");
     }
   }
 
@@ -195,7 +204,10 @@ const SignUp = () => {
           {/* Social Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
             {/* Google */}
-            <button className="flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 active:scale-95 text-slate-700 text-sm font-semibold shadow-sm transition-all duration-150">
+            <button 
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 active:scale-95 text-slate-700 text-sm font-semibold shadow-sm transition-all duration-150">
               <svg className="w-5 h-5" viewBox="0 0 48 48">
                 <path fill="#EA4335" d="M24 9.5c3.1 0 5.8 1.1 8 2.9l6-6C34.5 3.1 29.6 1 24 1 14.6 1 6.7 6.7 3.2 14.8l7 5.4C12 14.3 17.5 9.5 24 9.5z"/>
                 <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.8 7.2l7.4 5.8c4.3-4 6.8-10 6.8-17z"/>
