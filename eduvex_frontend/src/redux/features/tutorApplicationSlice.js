@@ -1,37 +1,48 @@
-import { createSlice, createAsyncThunk, isRejectedWithValue } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import API_URL from '../../api/axios';
 
 const initialState = {
-    application: null,
-    loading: false,
+    status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed',
     error: null,
+    submittedData: null,
+    form: {
+        fullName: '',
+        bio: '',
+        skills: [],
+        experience: '',
+        categories: [],
+        linkedin: '',
+        portfolio: '',
+        photo: null
+    }
 };
 
 export const submitTutorApplication = createAsyncThunk(
     'tutor/submitApplication',
-    async (FormData, { isRejectedWithValue }) => {
+    async (formData, { rejectWithValue }) => {
+        console.log('11111111111111111111111111111')
         try {
-            console.log(FormData,'FormData')
+            console.log(formData,'formData')
             const payload = new FormData();
 
-            payload.append('fullName', FormData.fullName.trim());
-            payload.append('bio', FormData.bio.trim());
-            payload.append('experience', FormData.experience);
-            payload.append('linkedin', FormData.linkedin.trim());
-            payload.append('portfolio', FormData.portfolio.trim());
+            payload.append('fullName', formData.fullName.trim());
+            payload.append('bio', formData.bio.trim());
+            payload.append('experience', formData.experience);
+            payload.append('linkedin', formData.linkedin.trim());
+            payload.append('portfolio', formData.portfolio.trim());
 
-            payload.append('skills', JSON.stringify(FormData.skills));
-            payload.append('categories', JSON.stringify(FormData.categories));
+            payload.append('skills', JSON.stringify(formData.skills));
+            payload.append('categories', JSON.stringify(formData.categories));
 
-            if (FormData.photo) {
-                payload.append('photo', FormData.photo);
+            if (formData.photo) {
+                payload.append('photo', formData.photo);
             }
-
-            const response = await API_URL.post('/tutor-application', payload);
+            console.log('22222222222222222')
+            const response = await API_URL.post('/tutor/tutor-application', payload);
             return response.data;
         } catch (error) {
             // axios wraps 4xx/5xx in err.response
-            const serverError = err.response?.data;
+            const serverError = error.response?.data;
             const errorMsg = serverError?.errors
                 ? serverError.errors.join(' - ')
                 : serverError?.message || 'Something went wrong. Please try again.';
@@ -56,6 +67,7 @@ const tutorApplicationSlice = createSlice({
             state.status = 'idle';
             state.error = null;
             state.submittedData = null;
+            state.form = initialState.form;
         },
 
         clearError(state) {
@@ -72,7 +84,7 @@ const tutorApplicationSlice = createSlice({
         })
         .addCase(submitTutorApplication.fulfilled, (state, action) => {
             state.status = 'succeeded';
-            state.submitTutorApplication = action.payload;
+            state.submittedData = action.payload;
             state.error = null;
         })
         .addCase(submitTutorApplication.rejected, (state, action) => {

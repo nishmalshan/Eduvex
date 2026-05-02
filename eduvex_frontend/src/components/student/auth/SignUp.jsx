@@ -75,7 +75,6 @@ const SignUp = () => {
 
   const handleGoogleSignIn = () => {
     try {
-      console.log('1111111111111111111')
       window.location.href = "http://localhost:5000/auth/google";
     } catch (error) {
       setError("Google sign-up failed");

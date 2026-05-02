@@ -91,7 +91,6 @@ export const googleAuthCallback = async (req, res) => {
         const fullName = req.user.displayName;
 
         const result = await googleAuthService({ googleId, email, fullName });
-        console.log(result,'result')
         
         // Generate JWT
         const token = generateToken(result.user._id);

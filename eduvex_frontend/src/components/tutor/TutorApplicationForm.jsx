@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import {
   User, FileText, Zap, Briefcase, Link2, Camera, BookOpen,
-  ChevronRight, ChevronLeft, Check, Upload, X, Plus
+  ChevronRight, ChevronLeft, Check, Upload, X, Plus, Loader2
 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { clearError, submitTutorApplication } from '../../redux/features/tutorApplicationSlice';
@@ -95,12 +95,16 @@ const TutorApplicationForm = () => {
   // ─────────────────────────────────────────────
 
   const handleSubmit = async () => {
+    console.log('0000000000000000000')
     setIsLoading(true);
     setSubmitError(null);
     dispatch(clearError());
 console.log(form,'form')
     // ── Submit — dispatch the AsyncThunk
-    const result = await dispatch(submitTutorApplication(form))
+     const result = await dispatch(submitTutorApplication(form))
+    if (submitTutorApplication.fulfilled.match(result)) {
+      setSubmitted(true);
+    }
   }
 
   if (submitted) {
@@ -409,11 +413,20 @@ console.log(form,'form')
               </button>
             ) : (
               <button
-                onClick={(handleSubmit)}
+                onClick={handleSubmit}
                 className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-blue-700 transition-all duration-200"
               >
-                <Check className="w-4 h-4" />
-                Submit Application
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Submit Application
+                  </>
+                )}
               </button>
             )}
           </div>

@@ -12,7 +12,7 @@ export const store = configureStore({
         getDefaultMiddleware({
             serializableCheck: {
                 ignoredPaths: ['tutorApplication.form.photo'],
-                ignoredActionPaths: ['payload.photo'],
-            },
+                ignoredActionPaths: ['meta.arg.photo', 'payload.photo']
+            }
         }),
 })

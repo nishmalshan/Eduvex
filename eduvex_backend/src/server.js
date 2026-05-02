@@ -5,6 +5,7 @@ import "./config/passport.js";
 import express from "express"
 import cookieParser from "cookie-parser"
 import authRoutes from "./routes/auth.routes.js"
+import tutorRoutes from "./routes/tutor.routes.js"
 import connectDB from "./config/db.js"
 import cors from "cors";
 import passport from "passport"
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(passport.initialize());
 
 app.use("/", authRoutes)
+app.use("/tutor", tutorRoutes)
 
 
 

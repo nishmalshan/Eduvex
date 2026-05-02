@@ -58,18 +58,14 @@ export const loginService = async ({ email, password }) => {
 
 export const googleAuthService = async (data) => {
     try {
-        console.log(data,'data')
         let user;
 
         // Check user with googleId
         user = await findUserByGoogleId(data.googleId);
-        console.log('2222222222222222')
-        console.log(user, 'findUserByGoogleId result')
 
         // If not found check with email
         if (!user) {
             user = await findUserByEmail(data.email);
-            console.log(user, 'findByEmail result')
             // User exists with email signup
             if (user) {
                 user.googleId = data.googleId;
