@@ -39,7 +39,7 @@ const upload = multer({
 })
 
 
-console.log('3333333333333333333333333')
+
 router.post("/tutor-application", protect, upload.single('photo'), submitApplication);
 // router.get("/tutor-applications", protect, getApplications);
 

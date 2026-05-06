@@ -2,20 +2,13 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API_URL from "../../api/axios";
 
 const initialState = {
+    loading: false,
+    error: null,
     user: null,
     token: null,
     isAuthenticated: false,
 };
 
-const saveAuthToStorage = (user) => {
-    if (user) {
-        localStorage.setItem("authUser", JSON.stringify(user));
-    }
-};
-
-const clearAuthStorage = () => {
-    localStorage.removeItem("authUser");
-};
 
 // Async thunk for signup 
 export const registerUser = createAsyncThunk(
@@ -66,13 +59,11 @@ const authSlice = createSlice({
             state.user = action.payload.user;
             state.token = action.payload.token || null;
             state.isAuthenticated = true;
-            saveAuthToStorage(action.payload.user);
         },
         logout: (state) => {
             state.user = null;
             state.token = null;
             state.isAuthenticated = false;
-            clearAuthStorage();
         }
     },
     extraReducers: (builder) => {
@@ -95,10 +86,10 @@ const authSlice = createSlice({
 
             // Login
             .addCase(loginUser.fulfilled, (state, action) => {
+                state.loading = false
                 state.user = action.payload.user
                 state.token = action.payload.token || null
                 state.isAuthenticated = true
-                saveAuthToStorage(action.payload.user)
             })
 
             // Logout
@@ -106,11 +97,9 @@ const authSlice = createSlice({
                 state.user = null
                 state.token = null
                 state.isAuthenticated = false
-                clearAuthStorage();
             })
     }
 });
 
 export const { logout, loginSuccess } = authSlice.actions;
-
 export default authSlice.reducer;

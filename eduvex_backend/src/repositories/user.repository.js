@@ -25,3 +25,14 @@ export const findUserByGoogleId = async (googleId) => {
         throw error;
     }
 }
+
+export const findUserById = async (id) => {
+    try {
+        console.log(typeof id,'4444444444444')
+        const user = await User.findById(id).select("-password");
+        console.log(user, 'findUserById result')
+        return user;
+    }   catch (error) {
+        throw error;
+    }
+}

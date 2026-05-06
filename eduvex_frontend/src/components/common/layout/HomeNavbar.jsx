@@ -63,7 +63,7 @@ const HomeNavbar = () => {
             <a href="#browse" className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
               Browse
             </a>
-            <a href="/become-tutor" className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
+            <a href="/tutor/application" className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
               Become a Tutor
             </a>
           </div>
@@ -117,7 +117,7 @@ const HomeNavbar = () => {
                     Cart
                   </Link>
                   <Link
-                    to="/become-tutor"
+                    to="/tutor/application"
                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                     onClick={() => setIsProfileOpen(false)}
                   >

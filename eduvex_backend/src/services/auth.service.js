@@ -87,3 +87,26 @@ export const googleAuthService = async (data) => {
 
     }
 }
+
+
+
+
+// Admin Service
+
+export const adminLoginService = async (email, password) => {
+    try {
+        console.log('666666666666666')
+        const admin = await findUserByEmail(email);
+        if (!admin) {
+            throw new Error("Invalid credentials");
+        }
+        const isMatch = await bcrypt.compare(password, admin.password);
+        console.log(isMatch, '77777777777');
+        if (!isMatch) {
+            throw new Error("Invalid credentials");
+        }
+        return admin;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}

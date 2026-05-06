@@ -61,6 +61,7 @@ const Login = () => {
     }
   }
 
+  // For demonstration, this just redirects to the backend Google auth route. In a real app, you'd want to handle the OAuth flow more robustly.
   const handleGoogleLogin = () => {
     try {
       window.location.href = "http://localhost:5000/auth/google";

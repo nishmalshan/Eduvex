@@ -1,6 +1,7 @@
 import { registerUserService, loginService, googleAuthService } from "../services/auth.service.js";
 import jwt from "jsonwebtoken";
 import { generateToken } from "../utils/generateToken.js";
+import { findUserById } from "../repositories/user.repository.js";
 
 
 export const signup = async (req, res) => {
@@ -31,15 +32,16 @@ export const signup = async (req, res) => {
     }
 }
 
-export const checkAuth = (req, res) => {
+export const checkAuth = async (req, res) => {
     try {
-        if (!req.user) {
+        const user = await findUserById(req.user.id);
+        console.log(user, 'user')
+        if (!user) {
+            console.log('No user')
             return res.status(401).json({ message: "Unauthorized" });
         }
 
-        res.json({
-            user: req.user
-        });
+        res.json({ user });
     } catch (error) {
         res.status(500).json({ message: "Server error" })
     }
