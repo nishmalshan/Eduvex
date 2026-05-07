@@ -8,15 +8,6 @@ const initialState = {
     error: null
 }
 
-const saveAuthToStorage = (admin) => {
-    if (admin) {
-        localStorage.setItem("authAdmin", JSON.stringify(admin));
-    }
-};
-
-const clearAuthStorage = () => {
-    localStorage.removeItem("authAdmin");
-};
 
 
 export const submintAdminLogin = createAsyncThunk(
@@ -24,7 +15,7 @@ export const submintAdminLogin = createAsyncThunk(
     async ({ email, password }, { rejectWithValue }) => {
         try {
             const response = await API_URL.post("/admin/login", { email, password });
-            console.log(response.data.admin, 'resssssssssssss')
+            console.log(response.data.admin, 'admin check-auth response')
             return response.data;
         } catch (error) {
             const serverError = error.response?.data;
@@ -33,6 +24,16 @@ export const submintAdminLogin = createAsyncThunk(
         }
     }
 )
+
+
+// Async thunk for logout user
+export const logoutAdmin = createAsyncThunk(
+    "auth/logoutAdmin",
+    async () => {
+        console.log('Logout 22222222222222222')
+        await API_URL.post("/admin/logout")
+    }
+);
 
 const adminLoginSlice = createSlice({
     name: "adminAuth",
@@ -48,7 +49,6 @@ const adminLoginSlice = createSlice({
             state.isAuthenticated = false;
             state.admin = null;
             state.token = null;
-            clearAuthStorage();
         }
     },
 
@@ -65,7 +65,6 @@ const adminLoginSlice = createSlice({
                 state.isAuthenticated = true;
                 state.admin = action.payload.admin;
                 state.token = action.payload.token || null;
-                saveAuthToStorage(action.payload.admin);
             })
             .addCase(submintAdminLogin.rejected, (state, action) => {
                 state.loading = false;
@@ -73,12 +72,11 @@ const adminLoginSlice = createSlice({
             })
 
             // Logout case
-            // .addCase(logoutUser.fulfilled, (state) => {
-            //     state.isAuthenticated = false;
-            //     state.admin = null;
-            //     state.token = null;
-            //     clearAuthStorage();
-            // })
+            .addCase(logoutAdmin.fulfilled, (state) => {
+                state.isAuthenticated = false;
+                state.admin = null;
+                state.token = null;
+            })
     }
 })
 

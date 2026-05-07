@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import "./AdminLogin.css";
-import { submintAdminLogin } from "../../../redux/features/adminLoginSlice";
+import { submintAdminLogin } from "../../../redux/features/adminAuthSlice";
 import { useNavigate } from "react-router-dom";
 
 const EyeIcon = ({ open }) => (

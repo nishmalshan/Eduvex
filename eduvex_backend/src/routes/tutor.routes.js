@@ -5,7 +5,7 @@ import cloudinary from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 
 import { submitApplication, getApplications } from "../controllers/tutor.controller.js";
-import { protect } from "../middlewares/auth.middleware.js";
+import { protectUser } from "../middlewares/protectUser.js";
 
 
 // ── cloudinary configuration ─────────────────────────────────────────────
@@ -40,8 +40,8 @@ const upload = multer({
 
 
 
-router.post("/tutor-application", protect, upload.single('photo'), submitApplication);
-// router.get("/tutor-applications", protect, getApplications);
+router.post("/tutor-application", protectUser, upload.single('photo'), submitApplication);
+// router.get("/tutor-applications", protectUser, getApplications);
 
 
 export default router;

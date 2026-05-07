@@ -35,9 +35,9 @@ export const signup = async (req, res) => {
 export const checkAuth = async (req, res) => {
     try {
         const user = await findUserById(req.user.id);
-        console.log(user, 'user')
+        // console.log(user, 'user')
         if (!user) {
-            console.log('No user')
+            // console.log('No user')
             return res.status(401).json({ message: "Unauthorized" });
         }
 

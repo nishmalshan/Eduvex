@@ -1,5 +1,8 @@
 import { useState } from "react";
 import "./AdminDashboard.css";
+import { logoutAdmin } from "../../../redux/features/adminAuthSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 // ── Icons ──────────────────────────────────────────────────────────────────
 const Icon = ({ d, size = 20 }) => (
@@ -82,6 +85,20 @@ const AdminDashboard = () => {
   const [collapsed, setCollapsed]   = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+
+  const handleLogout = async () => {
+    console.log('Logout 11111111111')
+      await dispatch(logoutAdmin());
+  
+      if (logoutAdmin.fulfilled.match) {
+        console.log('Logout 44444444444444')
+        navigate("/admin/login")
+      }
+    }
+
   return (
     <div className="adm-root">
       {/* Mobile overlay */}
@@ -140,7 +157,9 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
-          <button className="adm-logout-btn" title="Logout">
+          <button className="adm-logout-btn" title="Logout"
+          onClick={handleLogout}
+          >
             <NavIcon name="logout" size={18} />
             {!collapsed && <span>Logout</span>}
           </button>
