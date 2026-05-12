@@ -1,10 +1,9 @@
-import { application } from "../repositories/tutor.repository.js";
+import { application, getAllApplications } from "../repositories/tutor.repository.js";
 
 
 
 export const submitApplication = async (req, res) => {
     try {
-        console.log('c1111111111')
         const {
             fullName,
             bio,
@@ -15,12 +14,10 @@ export const submitApplication = async (req, res) => {
             portfolio,
         } = req.body;
 
-        console.log(req.body, 'req.body')
-        console.log(typeof req.file.path,'req.file')
 
         if (!fullName || !bio || !skills || !experience || !categories) {
-            console.log('eeeeeeeeeeeee')
-            return res.status(400).json({ success: false,
+            return res.status(400).json({
+                success: false,
                 message: "Please fill in all required fields"
             })
         }
@@ -28,18 +25,14 @@ export const submitApplication = async (req, res) => {
         let parsedSkills, parsedCategories;
 
         try {
-            console.log('c222222222222')
             parsedSkills = JSON.parse(skills);
             parsedCategories = JSON.parse(categories);
-            console.log(parsedSkills, 'parsedSkills')
-            console.log(parsedCategories, 'parsedCategories')
         } catch (error) {
-            console.log(error,'catch')
-            return res.status(400).json({ success: false,
+            return res.status(400).json({
+                success: false,
                 message: "Invalid format for skills or categories"
             })
         }
-        console.log(req.user,'req.user')
 
         const result = await application({
             fullName,
@@ -52,8 +45,9 @@ export const submitApplication = async (req, res) => {
             profilePhotoUrl: req.file?.path || null,
             userId: req.user || null
         })
-        console.log(result, "c555555555")
-        return res.status(201).json({ success: true,
+
+        return res.status(201).json({
+            success: true,
             message: "Application submitted successfully",
             data: {
                 id: result._id,
@@ -72,10 +66,40 @@ export const submitApplication = async (req, res) => {
 
 
 
+// ── GET /admin/tutor-applications ─────────────────────────────────────────
+// Query param: ?status=pending | approved | rejected | under_review | all
 export const getApplications = async (req, res) => {
     try {
-        
+        console.log('333333333333333')
+        const { status } = req.query;
+
+        const applications = await getAllApplications(status || null);
+        console.log(applications, 'applications')
+
+        const shaped = applications.map((app) => ({
+            _id: app._id,
+            name: app.fullName,
+            email: app.userId?.email || "—",
+            avatar: app.userId?.profilePhotoUrl || null,
+            subject: app.categories?.[0] || "—",   // primary category as subject
+            categories: app.categories,
+            experience: app.experience,
+            bio: app.bio,
+            linkedin: app.linkedin,
+            portfolio: app.portfolio,
+            status: app.status,
+            createdAt: app.createdAt,
+        }));
+
+        return res.status(200).json({
+            success: true,
+            applications: shaped,
+            total: shaped.length,
+        });
     } catch (error) {
-        
+        console.error("getApplications error:", error);
+        return res
+            .status(500)
+            .json({ success: false, message: "Server error. Please try again later." });
     }
 }

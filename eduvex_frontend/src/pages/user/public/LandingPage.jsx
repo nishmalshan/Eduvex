@@ -1,11 +1,11 @@
 import React from 'react'
 import Navbar from '../../../components/common/layout/Navbar'
 import Header from '../../../components/common/layout/Header'
-import About from '../../../components/student/sections/About'
-import CoursesSection from '../../../components/student/sections/CoursesSection'
-import TrustBanner from '../../../components/student/sections/TrustBanner'
+import About from '../../../components/user/sections/About'
+import CoursesSection from '../../../components/user/sections/CoursesSection'
+import TrustBanner from '../../../components/user/sections/TrustBanner'
 import Footer from '../../../components/common/layout/Footer'
-import CourseCategoryCards from '../../../components/student/sections/CourseCategoryCards'
+import CourseCategoryCards from '../../../components/user/sections/CourseCategoryCards'
 
 const landingPage = () => {
   return (

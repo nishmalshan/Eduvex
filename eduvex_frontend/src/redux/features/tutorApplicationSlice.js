@@ -2,19 +2,10 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import API_URL from '../../api/axios';
 
 const initialState = {
-    status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'failed',
+    applications: [],
+    loading: false,
+    actionLoading: null, // stores the id of the app currently being acted on
     error: null,
-    submittedData: null,
-    form: {
-        fullName: '',
-        bio: '',
-        skills: [],
-        experience: '',
-        categories: [],
-        linkedin: '',
-        portfolio: '',
-        photo: null
-    }
 };
 
 export const submitTutorApplication = createAsyncThunk(
@@ -52,28 +43,42 @@ export const submitTutorApplication = createAsyncThunk(
 )
 
 
+export const fetchTutorApplications = createAsyncThunk(
+  "tutorApplications/fetchAll",
+  async (_, { rejectWithValue }) => {
+    try {
+        console.log('2222222222222222')
+      const response = await API_URL.get("/admin/tutor-applications");
+      console.log(response.data,'application response')
+      return response.data; // expects { applications: [...] }
+    } catch (error) {
+      const msg = error.response?.data?.message || "Failed to fetch applications.";
+      return rejectWithValue(msg);
+    }
+  }
+);
+
+
 const tutorApplicationSlice = createSlice({
-    name: 'tutorApplication',
+    name: 'tutorApplications',
     initialState,
 
     reducers: {
         // Update any single form field
-        updateField(state, action) {
-            const { field, value } = action.payload;
-            state.form[field] = value;
-        },
+        // updateField(state, action) {
+        //     const { field, value } = action.payload;
+        //     state.form[field] = value;
+        // },
 
-        resetApplication(state) {
-            state.status = 'idle';
-            state.error = null;
-            state.submittedData = null;
-            state.form = initialState.form;
-        },
+        // resetApplication(state) {
+        //     state.error = null;
+        //     state.submittedData = null;
+        //     state.form = initialState.form;
+        // },
 
-        clearError(state) {
+        clearError: (state) => {
             state.error = null;
-            state.status = 'idle';
-        }
+        },
     },
 
     extraReducers: (builder) => {
@@ -90,6 +95,20 @@ const tutorApplicationSlice = createSlice({
         .addCase(submitTutorApplication.rejected, (state, action) => {
             state.status = 'failed';
             state.error = action.payload || 'Failed to submit application. Please try again.';
+        })
+
+        // ── fetchTutorApplications ──
+        .addCase(fetchTutorApplications.pending, (state) => {
+            state.loading = true;
+            state.error = null
+        })
+        .addCase(fetchTutorApplications.fulfilled, (state, action) => {
+            state.loading = false;
+            state.applications = action.payload.applications ?? action.payload;
+        })
+        .addCase(fetchTutorApplications.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload
         })
     }
 })

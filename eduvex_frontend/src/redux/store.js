@@ -6,8 +6,8 @@ import adminLoginReducer from "./features/adminAuthSlice";
 export const store = configureStore({
     reducer: {
         auth: authReducer,
-        tutorApplication: tutorApplicationReducer,
-        adminAuth: adminLoginReducer
+        tutorApplications: tutorApplicationReducer,
+        adminAuth: adminLoginReducer,
     },
 
     middleware: (getDefaultMiddleware) =>

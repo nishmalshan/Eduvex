@@ -6,11 +6,9 @@ import { findUserById } from "../repositories/user.repository.js";
 
 export const adminLogin = async (req, res) => {
     try {
-        console.log('555555555555555')
         const { email, password } = req.body;
         const result = await adminLoginService(email, password);
         const { password: _, ...admin } = result.toObject();
-        console.log(result,'adminnnnnnnnnnnnn')
         const token = generateToken(admin._id);
 
         res.cookie("admin_token", token, {
@@ -31,9 +29,7 @@ export const adminLogin = async (req, res) => {
 export const checkAdminAuth = async (req, res) => {
     try {
         const admin = await findUserById(req.admin.id);
-                console.log(admin, 'admin')
                 if (!admin) {
-                    console.log('No admin')
                     return res.status(401).json({ message: "Unauthorized" });
                 }
 
@@ -51,7 +47,6 @@ export const checkAdminAuth = async (req, res) => {
 
 export const logoutAdmin = async (req, res) => {
     try {
-        console.log('Logout 333333333333333333333')
         res.clearCookie("admin_token", {
             httpOnly: true,
             secure: false,

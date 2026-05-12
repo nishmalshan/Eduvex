@@ -1,20 +1,24 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import LandingPage from './pages/student/public/LandingPage'
-import LoginPage from './pages/student/auth/LoginPage'
-import SignupPage from './pages/student/auth/SignupPage'
-import HomePage from './pages/student/home/HomePage'
+import LandingPage from './pages/user/public/LandingPage'
+import LoginPage from './pages/user/auth/LoginPage'
+import SignupPage from './pages/user/auth/SignupPage'
+import HomePage from './pages/user/home/HomePage'
 import { useDispatch, useSelector } from 'react-redux'
 import { loginSuccess } from './redux/features/authSlice'
-// import PublicRoute from './components/common/routes/PublicRoute'
-// import ProtectedRoute from './components/common/routes/ProtectedRoute'
 import API_URL from './api/axios'
-import GoogleSuccess from './pages/student/auth/GoogleSuccess'
+import GoogleSuccess from './pages/user/auth/GoogleSuccess'
 import TutorApplicationForm from './components/tutor/TutorApplicationForm'
 import AdminLogin from './components/admin/auth/AdminLogin'
-import AdminDashboard from './components/admin/dashboard/AdminDashboard'
 import { adminAuthSuccess } from './redux/features/adminAuthSlice'
+import Loader from './components/common/layout/Loader'
+import DashboardPage from './pages/admin/DashboardPage'
+import TutorApplicationsPage from './pages/admin/TutorApplicationsPage'
+import AdminLayout from './components/common/layout/AdminLayout'
+import TutorsList from './components/admin/dashboard/TutorsList'
+import UsersPage from './pages/admin/UsersPage'
+import CoursesPage from './pages/admin/CoursesPage'
 
 function App() {
   const dispatch = useDispatch()
@@ -43,7 +47,7 @@ function App() {
     
     const checkAdminAuth = async () => {
       try {
-        console.log('check admin 111111111111')
+        console.log('check admin')
         const response = await API_URL.get("/admin/check-auth");
         console.log(response, 'admin check-auth response')
         if (response.status === 200) {
@@ -69,31 +73,47 @@ function App() {
   }, [dispatch])
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        Checking authentication...
-      </div>
-    )
+    return <Loader/>
   }
 
   return (
     <Router>
-      <Routes>
-        <Route path='/' element={isUserAuth ? <HomePage /> : <LandingPage />} />
+  <Routes>
 
-        <Route path='/login' element={ isUserAuth ? <Navigate to="/"/> : <LoginPage /> } />
-        <Route path='/signup' element={ isUserAuth ? <Navigate to="/"/> : <SignupPage /> } />
-        <Route path='/google-success' element={<GoogleSuccess />} />
+    {/* Home */}
+    <Route path='/' element={isUserAuth ? <HomePage /> : <LandingPage />} />
 
-        {/* Become a tutor form */}
-        <Route path='/tutor/application' element={ isUserAuth ? <TutorApplicationForm/> : <Navigate to="/login" replace /> }/>
+    {/* Auth */}
+    <Route path='/login' element={isUserAuth ? <Navigate to="/" /> : <LoginPage />} />
+    <Route path='/signup' element={isUserAuth ? <Navigate to="/" /> : <SignupPage />} />
+    <Route path='/google-success' element={<GoogleSuccess />} />
 
+    {/* Tutor */}
+    <Route
+      path='/tutor/application'
+      element={isUserAuth ? <TutorApplicationForm /> : <Navigate to="/login" replace />}
+    />
 
-        {/* Admin login route */}
-        <Route path='/admin/login' element={ isAdminAuth ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin/> } />
-        <Route path='/admin/dashboard' element={ isAdminAuth ? <AdminDashboard/> : <Navigate to="/admin/login" replace /> } />
-      </Routes>
-    </Router>
+    {/* Admin Login */}
+    <Route
+      path='/admin/login'
+      element={isAdminAuth ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin />}
+    />
+
+    {/* Admin Protected Routes */}
+    <Route
+      path='/admin'
+      element={isAdminAuth ? <AdminLayout /> : <Navigate to="/admin/login" replace />}
+    >
+        <Route path='dashboard' element={<DashboardPage />} />
+        <Route path='tutors' element={<TutorApplicationsPage />} />
+        <Route path='tutorList' element={<TutorsList />} />
+        <Route path='users' element={<UsersPage />} />
+        <Route path='courses' element={<CoursesPage />} />
+    </Route>
+
+  </Routes>
+</Router>
   )
 }
 
