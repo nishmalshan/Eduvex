@@ -16,3 +16,15 @@ export const getAllApplications = async (status = null) => {
     .populate("userId", "name email profilePhoto")
     .sort({ createdAt: -1 })
 }
+
+export const getApplicationById = async (id) => {
+    return await TutorApplication.findById(id).populate("userId", "name email profilePhoto")
+}
+
+export const updateApplicationStatus = async (id, status) => {
+    return await TutorApplication.findByIdAndUpdate(
+        id,
+        { status },
+        { new: true, runValidators: true }
+    ).populate("userId", "name email profilePhoto")
+}

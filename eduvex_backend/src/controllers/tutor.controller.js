@@ -1,4 +1,4 @@
-import { application, getAllApplications } from "../repositories/tutor.repository.js";
+import { application, getAllApplications, updateApplicationStatus, getApplicationById } from "../repositories/tutor.repository.js";
 
 
 
@@ -80,7 +80,7 @@ export const getApplications = async (req, res) => {
             _id: app._id,
             name: app.fullName,
             email: app.userId?.email || "—",
-            avatar: app.userId?.profilePhotoUrl || null,
+            avatar: app.profilePhotoUrl || null,
             subject: app.categories?.[0] || "—",   // primary category as subject
             categories: app.categories,
             experience: app.experience,
@@ -90,6 +90,7 @@ export const getApplications = async (req, res) => {
             status: app.status,
             createdAt: app.createdAt,
         }));
+        console.log(shaped,'shaped')
 
         return res.status(200).json({
             success: true,
@@ -98,6 +99,88 @@ export const getApplications = async (req, res) => {
         });
     } catch (error) {
         console.error("getApplications error:", error);
+        return res
+            .status(500)
+            .json({ success: false, message: "Server error. Please try again later." });
+    }
+}
+
+
+// ── PATCH /admin/tutor-applications/:id/approve ───────────────────────────
+export const approveApplication = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const existing = await getApplicationById(id);
+        if (!existing) {
+            return res.status(404).json({ success: false, message: "Application not found." });
+        }
+
+        if (existing === "approved") {
+            return res.status(400).json({ success: false, message: "Application is already approved." });
+        }
+
+        const updated = await updateApplicationStatus(id, "approved");
+
+        return res.status(200).json({
+            success: true,
+            message: "Application approved successfully.",
+            application: {
+                _id: updated._id,
+                name: updated.fullName,
+                email: updated.userId?.email || "—",
+                avatar: updated.userId?.profilePhoto || null,
+                subject: updated.categories?.[0] || "—",
+                categories: updated.categories,
+                experience: updated.experience,
+                status: updated.status,
+                createdAt: updated.createdAt,
+                updatedAt: updated.updatedAt,
+            },
+        });
+    } catch (error) {
+        console.error("approveApplication error:", error);
+        return res
+            .status(500)
+            .json({ success: false, message: "Server error. Please try again later." });
+    }
+}
+
+
+// ── PATCH /admin/tutor-applications/:id/reject ────────────────────────────
+export const rejectApplication = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const existing = await getApplicationById(id);
+        if (!existing) {
+            return res.status(404).json({ success: false, message: "Application not found." });
+        }
+
+        if (existing.status === "rejected") {
+            return res.status(400).json({ success: false, message: "Application is already rejected." });
+        }
+
+        const updated = await updateApplicationStatus(id, "rejected");
+
+        return res.status(200).json({
+            success: true,
+            message: "Application rejected.",
+            application: {
+                _id: updated._id,
+                name: updated.fullName,
+                email: updated.userId?.email || "—",
+                avatar: updated.userId?.profilePhoto || null,
+                subject: updated.categories?.[0] || "—",
+                categories: updated.categories,
+                experience: updated.experience,
+                status: updated.status,
+                createdAt: updated.createdAt,
+                updatedAt: updated.updatedAt,
+            },
+        });
+    } catch (error) {
+        console.error("rejectApplication error:", error);
         return res
             .status(500)
             .json({ success: false, message: "Server error. Please try again later." });

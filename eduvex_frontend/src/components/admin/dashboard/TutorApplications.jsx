@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import "./TurorApplications.css"
 import {
   fetchTutorApplications,
-  // approveTutorApplication,
-  // rejectTutorApplication,
+  approveTutorApplication,
+  rejectTutorApplication,
 } from "../../../redux/features/tutorApplicationSlice";
 
 // ── Skeleton row ──────────────────────────────────────────────────────────
@@ -24,6 +25,7 @@ const SkeletonRow = () => (
 
 // ── Detail popup ──────────────────────────────────────────────────────────
 const DetailPopup = ({ app, onClose, onApprove, onReject, actionLoading }) => {
+  console.log(app, 'app')
   if (!app) return null;
   const isActing = actionLoading === app._id;
 
@@ -53,8 +55,8 @@ const DetailPopup = ({ app, onClose, onApprove, onReject, actionLoading }) => {
         {/* Avatar + name */}
         <div className="tap-header">
           <div className="tap-avatar-lg">
-            {app.profilePhotoUrl
-              ? <img src={app.profilePhotoUrl} alt={app.name} />
+            {app.avatar
+              ? <img src={app.avatar} alt={app.name} />
               : <span>{app.name?.[0] ?? "?"}</span>
             }
           </div>
@@ -184,205 +186,7 @@ const TutorApplications = () => {
     <>
       {/* ── Scoped styles ── */}
       <style>{`
-        /* Popup overlay */
-        .tap-overlay {
-          position: fixed; inset: 0;
-          background: rgba(0,0,0,0.6);
-          backdrop-filter: blur(5px);
-          z-index: 300;
-          display: flex; align-items: center; justify-content: center;
-          padding: 16px;
-          animation: tap-fadeIn 0.18s ease;
-        }
-        .tap-popup {
-          background: var(--bg-2);
-          border: 1px solid rgba(255,255,255,0.12);
-          border-radius: 16px;
-          width: 100%; max-width: 520px;
-          max-height: 92vh; overflow-y: auto;
-          padding: 28px;
-          position: relative;
-          animation: tap-slideUp 0.22s cubic-bezier(.16,1,.3,1);
-          scrollbar-width: thin;
-        }
-        .tap-close {
-          position: absolute; top: 14px; right: 14px;
-          width: 28px; height: 28px;
-          display: flex; align-items: center; justify-content: center;
-          background: var(--bg-3); border: 1px solid var(--border);
-          border-radius: 7px; color: var(--text-2); cursor: pointer;
-          transition: all 0.15s;
-        }
-        .tap-close:hover { background: var(--red-dim); color: var(--red); border-color: rgba(239,68,68,0.35); }
-
-        .tap-header {
-          display: flex; align-items: center; gap: 16px;
-          padding-bottom: 20px; margin-bottom: 20px;
-          border-bottom: 1px solid var(--border);
-        }
-        .tap-avatar-lg {
-          width: 68px; height: 68px; border-radius: 50%; flex-shrink: 0;
-          background: linear-gradient(135deg,#3b82f6,#6366f1);
-          display: flex; align-items: center; justify-content: center;
-          overflow: hidden;
-        }
-        .tap-avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
-        .tap-avatar-lg span { font-size: 24px; font-weight: 800; color: #fff; }
-        .tap-identity { flex: 1; min-width: 0; }
-        .tap-name { font-size: 17px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
-        .tap-email { font-size: 12.5px; color: var(--text-3); margin-top: 3px; }
-
-        .tap-grid {
-          display: grid; grid-template-columns: 1fr 1fr;
-          gap: 14px; margin-bottom: 20px;
-        }
-        .tap-field { display: flex; flex-direction: column; gap: 5px; }
-        .tap-field--full { grid-column: 1 / -1; }
-        .tap-label {
-          font-size: 10px; font-weight: 700;
-          letter-spacing: 1px; color: var(--text-3); text-transform: uppercase;
-        }
-        .tap-value { font-size: 13.5px; font-weight: 500; color: var(--text); }
-        .tap-bio {
-          font-size: 13px; color: var(--text-2); line-height: 1.75;
-          background: var(--bg-3); border-radius: 8px; padding: 12px 14px;
-          margin-top: 2px; border: 1px solid var(--border);
-        }
-
-        .tap-actions {
-          display: flex; gap: 10px;
-          padding-top: 18px; border-top: 1px solid var(--border);
-        }
-        .tap-btn {
-          flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px;
-          padding: 11px; border-radius: 10px; border: none;
-          font-family: var(--font); font-size: 13.5px; font-weight: 700;
-          cursor: pointer; transition: opacity 0.15s, transform 0.1s;
-        }
-        .tap-btn:hover:not(:disabled) { opacity: 0.85; }
-        .tap-btn:active:not(:disabled) { transform: scale(0.97); }
-        .tap-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-        .tap-btn--approve { background: var(--green); color: #000; }
-        .tap-btn--reject  { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
-
-        /* Filter bar */
-        .tap-toolbar {
-          display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-          padding: 12px 16px;
-          background: var(--bg-2); border: 1px solid var(--border);
-          border-radius: var(--radius);
-        }
-        .tap-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-        .tap-pill {
-          display: inline-flex; align-items: center; gap: 6px;
-          padding: 6px 13px; border-radius: 20px;
-          border: 1px solid var(--border); background: var(--bg-3);
-          color: var(--text-2); font-family: var(--font);
-          font-size: 12.5px; font-weight: 600; cursor: pointer;
-          transition: all 0.15s; white-space: nowrap;
-        }
-        .tap-pill:hover { border-color: var(--border-hover); color: var(--text); }
-        .tap-pill--all.tap-pill--on      { background: rgba(59,130,246,.12); color: var(--blue);  border-color: rgba(59,130,246,.3); }
-        .tap-pill--pending.tap-pill--on  { background: var(--amber-dim);     color: var(--amber); border-color: rgba(245,158,11,.35); }
-        .tap-pill--approved.tap-pill--on { background: var(--green-dim);     color: var(--green); border-color: rgba(34,197,94,.35); }
-        .tap-pill--rejected.tap-pill--on { background: var(--red-dim);       color: var(--red);   border-color: rgba(239,68,68,.35); }
-        .tap-count {
-          background: rgba(255,255,255,.08); border-radius: 20px;
-          padding: 1px 7px; font-size: 10px; font-weight: 700; font-family: var(--mono);
-        }
-
-        .tap-search {
-          display: flex; align-items: center; gap: 8px;
-          background: var(--bg-3); border: 1px solid var(--border);
-          border-radius: 8px; padding: 7px 12px;
-          flex: 1; min-width: 200px; max-width: 300px;
-          transition: border-color 0.15s; margin-left: auto;
-        }
-        .tap-search:focus-within { border-color: var(--blue); }
-        .tap-search svg { color: var(--text-3); flex-shrink: 0; }
-        .tap-search input {
-          background: none; border: none; outline: none;
-          color: var(--text); font-family: var(--font); font-size: 13px; width: 100%;
-        }
-        .tap-search input::placeholder { color: var(--text-3); }
-
-        /* Details button */
-        .tap-details-btn {
-          display: inline-flex; align-items: center; gap: 5px;
-          padding: 5px 11px; border-radius: 7px;
-          border: 1px solid var(--border); background: var(--bg-3);
-          color: var(--text-2); font-family: var(--font);
-          font-size: 12px; font-weight: 600; cursor: pointer;
-          transition: all 0.15s; white-space: nowrap;
-        }
-        .tap-details-btn:hover { background: var(--blue-dim); color: var(--blue); border-color: rgba(59,130,246,.3); }
-
-        /* Mobile cards */
-        .tap-cards { display: none; flex-direction: column; gap: 10px; }
-        .tap-card {
-          background: var(--bg-2); border: 1px solid var(--border);
-          border-radius: var(--radius-sm); padding: 14px;
-          display: flex; flex-direction: column; gap: 10px;
-          transition: border-color 0.15s;
-        }
-        .tap-card:hover { border-color: var(--border-hover); }
-        .tap-card-top { display: flex; align-items: center; gap: 12px; }
-        .tap-card-info { flex: 1; min-width: 0; }
-        .tap-card-name { font-size: 14px; font-weight: 700; color: var(--text); }
-        .tap-card-email { font-size: 11px; color: var(--text-3); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .tap-card-meta { display: flex; gap: 6px; flex-wrap: wrap; }
-        .tap-card-tag {
-          font-size: 11px; color: var(--text-2);
-          background: var(--bg-3); border: 1px solid var(--border);
-          border-radius: 20px; padding: 3px 9px;
-        }
-
-        /* Section */
-        .adm-section {
-          padding: 24px 28px 40px;
-          display: flex; flex-direction: column; gap: 16px;
-        }
-
-        /* Pagination */
-        .adm-pagination {
-          display: flex; align-items: center; justify-content: space-between;
-          padding: 12px 16px; border-top: 1px solid var(--border);
-          flex-wrap: wrap; gap: 8px;
-        }
-        .adm-pagination-info { font-size: 12px; color: var(--text-3); font-family: var(--mono); }
-        .adm-pagination-btns { display: flex; gap: 4px; }
-        .adm-page-btn {
-          width: 30px; height: 30px;
-          display: flex; align-items: center; justify-content: center;
-          border-radius: 7px; border: 1px solid var(--border);
-          background: var(--bg-3); color: var(--text-2);
-          font-size: 12px; font-weight: 600; cursor: pointer;
-          transition: all 0.15s;
-        }
-        .adm-page-btn:hover:not(:disabled) { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
-        .adm-page-btn--active { background: var(--blue); color: #fff !important; border-color: var(--blue); }
-        .adm-page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
-        /* Animations */
-        @keyframes tap-fadeIn  { from { opacity:0 } to { opacity:1 } }
-        @keyframes tap-slideUp { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
-        @keyframes adm-shimmer { 0%,100% { opacity:.45 } 50% { opacity:.9 } }
-
-        /* ── Responsive ── */
-        @media (max-width: 768px) {
-          .adm-section { padding: 14px 12px 28px; gap: 12px; }
-          .tap-toolbar { padding: 10px 12px; gap: 8px; }
-          .tap-search { max-width: 100%; min-width: unset; margin-left: 0; }
-          .tap-table-wrap { display: none; }
-          .tap-cards { display: flex; }
-          .tap-popup { padding: 20px 16px; }
-          .tap-grid { grid-template-columns: 1fr; }
-          .tap-header { flex-direction: column; align-items: flex-start; }
-        }
-        @media (max-width: 480px) {
-          .tap-pills { width: 100%; }
-          .tap-search { width: 100%; }
-        }
+        
       `}</style>
 
       <div className="adm-section">
@@ -482,8 +286,8 @@ const TutorApplications = () => {
                       <td>
                         <div className="adm-tutor-cell">
                           <div className="adm-avatar adm-avatar--sm" style={{ overflow:"hidden", flexShrink:0 }}>
-                            {app.profilePhotoUrl
-                              ? <img src={app.profilePhotoUrl} alt={app.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                            {app.avatar
+                              ? <img src={app.avatar} alt={app.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                               : app.name?.[0] ?? "?"
                             }
                           </div>
@@ -533,8 +337,8 @@ const TutorApplications = () => {
               <div key={app._id} className="tap-card">
                 <div className="tap-card-top">
                   <div className="adm-avatar" style={{ overflow:"hidden", flexShrink:0 }}>
-                    {app.profilePhotoUrl
-                      ? <img src={app.profilePhotoUrl} alt={app.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
+                    {app.avatar
+                      ? <img src={app.avatar} alt={app.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                       : app.name?.[0] ?? "?"
                     }
                   </div>

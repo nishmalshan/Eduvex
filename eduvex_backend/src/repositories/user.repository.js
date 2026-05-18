@@ -19,7 +19,7 @@ export const findUserByGoogleId = async (googleId) => {
         const user = await User.findOne({ googleId: String(googleId) });
         console.log(user, 'findUserByGoogleId result')
         return user;
-    }   catch (error) {
+    } catch (error) {
         throw error;
     }
 }
@@ -28,7 +28,17 @@ export const findUserById = async (id) => {
     try {
         const user = await User.findById(id).select("-password");
         return user;
-    }   catch (error) {
+    } catch (error) {
         throw error;
     }
+}
+
+export const getUsers = async () => {
+    return await User.find({ role: { $ne: "admin" } })
+        .select("-password")
+        .sort({ createdAt: -1 });
+}
+
+export const findUserByIdAndUpdate = async (id, updateData) => {
+    return await User.findByIdAndUpdate(id, updateData, { new: true, select: "-password" }).select("-password");
 }
