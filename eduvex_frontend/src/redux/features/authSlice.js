@@ -81,7 +81,6 @@ const authSlice = createSlice({
                 state.user = action.payload.user
                 state.token = action.payload.token || null
                 state.isAuthenticated = true
-                saveAuthToStorage(action.payload.user)
             })
 
             // Login

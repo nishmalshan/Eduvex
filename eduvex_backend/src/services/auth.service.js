@@ -28,7 +28,7 @@ export const registerUserService = async ({ fullName, email, password }) => {
         return { newUser, token }
 
     } catch (error) {
-        res.status(400).json({ success: false, message: error.message });
+        throw new Error(error.message);
     }
 }
 
@@ -84,7 +84,7 @@ export const googleAuthService = async (data) => {
 
         return { user };
     } catch (error) {
-
+        throw new Error(error.message);
     }
 }
 
@@ -95,13 +95,11 @@ export const googleAuthService = async (data) => {
 
 export const adminLoginService = async (email, password) => {
     try {
-        console.log('666666666666666')
         const admin = await findUserByEmail(email);
         if (!admin) {
             throw new Error("Invalid credentials");
         }
         const isMatch = await bcrypt.compare(password, admin.password);
-        console.log(isMatch, '77777777777');
         if (!isMatch) {
             throw new Error("Invalid credentials");
         }

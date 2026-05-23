@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 import { adminLogin, checkAdminAuth, logoutAdmin } from '../controllers/adminAuth.controller.js';
 import { protectAdmin } from '../middlewares/protectAdmin.js';
-import { getApplications, approveApplication, rejectApplication } from '../controllers/tutor.controller.js';
+import { getApplications, approveApplication, rejectApplication, getApprovedTutors, toggleTutorStatus } from '../controllers/tutor.controller.js';
 import { getAllUsers, blockUser, unblockUser } from '../controllers/user.controller.js';
 
 router.post("/login", adminLogin);
@@ -15,6 +15,8 @@ router.get("/check-auth", protectAdmin, checkAdminAuth)
 router.get("/tutor-applications", protectAdmin, getApplications);
 router.patch("/tutor-applications/:id/approve", protectAdmin, approveApplication);
 router.patch("/tutor-applications/:id/reject", protectAdmin, rejectApplication)
+router.get("/tutors", protectAdmin, getApprovedTutors);
+router.patch("/tutors/:id/toggle-status", protectAdmin, toggleTutorStatus);
 
 
 

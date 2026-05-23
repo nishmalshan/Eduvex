@@ -42,3 +42,13 @@ export const getUsers = async () => {
 export const findUserByIdAndUpdate = async (id, updateData) => {
     return await User.findByIdAndUpdate(id, updateData, { new: true, select: "-password" }).select("-password");
 }
+
+// user.repository.js
+
+export const updateUserRole = async (userId, role) => {
+    return await User.findByIdAndUpdate(
+        userId,
+        { role },
+        { new: true }
+    );
+}

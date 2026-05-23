@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { clearError, submitTutorApplication } from '../../redux/features/tutorApplicationSlice';
+import { useNavigate } from 'react-router-dom';
 
 const STEPS = [
   { id: 1, label: 'Personal', icon: User },
@@ -37,6 +38,7 @@ const TutorApplicationForm = () => {
   const fileRef = useRef();
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     fullName: '',
@@ -95,15 +97,14 @@ const TutorApplicationForm = () => {
   // ─────────────────────────────────────────────
 
   const handleSubmit = async () => {
-    console.log('0000000000000000000')
     setIsLoading(true);
     setSubmitError(null);
     dispatch(clearError());
-console.log(form,'form')
     // ── Submit — dispatch the AsyncThunk
      const result = await dispatch(submitTutorApplication(form))
     if (submitTutorApplication.fulfilled.match(result)) {
       setSubmitted(true);
+      setIsLoading(false);
     }
   }
 
@@ -122,10 +123,11 @@ console.log(form,'form')
             Our team will review your application and get back to you within 3–5 business days.
           </p>
           <button
-            onClick={() => { setSubmitted(false); setStep(1); setForm({ fullName: '', bio: '', skills: [], experience: '', linkedin: '', portfolio: '', photo: null, categories: [] }); setPhotoPreview(null); }}
+            onClick={() => { navigate('/')}}
+            // ; setSubmitted(false); setStep(1); setForm({ fullName: '', bio: '', skills: [], experience: '', linkedin: '', portfolio: '', photo: null, categories: [] }); setPhotoPreview(null); 
             className="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors"
           >
-            Submit Another Application
+            Go Home
           </button>
         </div>
       </div>

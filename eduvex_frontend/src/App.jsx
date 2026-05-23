@@ -9,7 +9,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { loginSuccess } from './redux/features/authSlice'
 import API_URL from './api/axios'
 import GoogleSuccess from './pages/user/auth/GoogleSuccess'
-import TutorApplicationForm from './components/tutor/TutorApplicationForm'
 import AdminLogin from './components/admin/auth/AdminLogin'
 import { adminAuthSuccess } from './redux/features/adminAuthSlice'
 import Loader from './components/common/layout/Loader'
@@ -19,6 +18,7 @@ import AdminLayout from './components/common/layout/AdminLayout'
 import TutorsList from './components/admin/dashboard/TutorsList'
 import UsersPage from './pages/admin/UsersPage'
 import CoursesPage from './pages/admin/CoursesPage'
+import TutorApplicationPage from './components/tutor/home/TutorApplicationPage'
 
 function App() {
   const dispatch = useDispatch()
@@ -91,7 +91,7 @@ function App() {
     {/* Tutor */}
     <Route
       path='/tutor/application'
-      element={isUserAuth ? <TutorApplicationForm /> : <Navigate to="/login" replace />}
+      element={isUserAuth ? <TutorApplicationPage /> : <Navigate to="/login" replace />}
     />
 
     {/* Admin Login */}

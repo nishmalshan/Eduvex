@@ -58,7 +58,7 @@ const SignUp = () => {
       setLoading(true);
 
       const resultAction = await dispatch(registerUser(form));
-
+      console.log(resultAction, 'result Action')
       if (registerUser.fulfilled.match(resultAction)) {
         navigate("/")
       } else {

@@ -21,6 +21,10 @@ const tutorFormSchema = new mongoose.Schema(
             minlength: [20, 'Bio must be at least 20 characters'],
             maxlength: [2000, 'Bio cannot exceed 2000 characters'],
         },
+        skills: {
+            type: [String],
+            required: [true, 'At least one skill is required'],
+        },
         experience: {
             type: String,
             required: [true, 'Experience level is required'],
@@ -55,6 +59,10 @@ const tutorFormSchema = new mongoose.Schema(
                 'Please enter a valid URL',
             ],
         },
+        isBlocked: {
+            type: Boolean,
+            default: false
+        },
 
         // ── Application status (managed by admin)
         status: {
@@ -72,4 +80,4 @@ const tutorFormSchema = new mongoose.Schema(
 
 tutorFormSchema.index({ status: 1, createdAt: -1 }); // For efficient querying of pending applications
 
-export default mongoose.model("TutorForm", tutorFormSchema);
+export default mongoose.model("TutorApplication", tutorFormSchema);

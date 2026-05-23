@@ -3,15 +3,36 @@ import API_URL from '../../api/axios';
 
 const initialState = {
     applications: [],
+    myApplication: null,
+    hasApplied: null,
     loading: false,
     actionLoading: null, // stores the id of the app currently being acted on
     error: null,
 };
 
+// ── Fetch the logged-in user's own application ────────────────────────────
+export const fetchMyApplication = createAsyncThunk(
+    'tutorApplications/fetchMine',
+    async (_, { rejectWithValue }) => {
+        try {
+            console.log('22222222222222111111')
+            const response = await API_URL.get('/tutor/my-application');
+            console.log(response.data, 'my application response')
+            return response.data; // { hasApplied: bool, application: {...} | null }
+        } catch (error) {
+            console.log(error.response,'slice error')
+            if (error.response?.status === 404) {
+                return { hasApplied: false, application: null };
+            }
+            const msg = error.response?.data?.message || 'Failed to fetch your application.';
+            return rejectWithValue(msg);
+        }
+    }
+);
+
 export const submitTutorApplication = createAsyncThunk(
     'tutor/submitApplication',
     async (formData, { rejectWithValue }) => {
-        console.log('11111111111111111111111111111')
         try {
             console.log(formData, 'formData')
             const payload = new FormData();
@@ -171,7 +192,22 @@ const tutorApplicationSlice = createSlice({
             .addCase(rejectTutorApplication.rejected, (state, action) => {
                 state.actionLoading = null;
                 state.error = action.payload;
-            });
+            })
+
+            // ── fetchMyApplication ──
+            .addCase(fetchMyApplication.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchMyApplication.fulfilled, (state, action) => {
+                state.loading = false;
+                state.hasApplied = action.payload.hasApplied;
+                state.myApplication = action.payload.application;
+            })
+            .addCase(fetchMyApplication.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
     }
 })
 

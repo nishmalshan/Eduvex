@@ -1,20 +1,33 @@
-import { application, getAllApplications, updateApplicationStatus, getApplicationById } from "../repositories/tutor.repository.js";
+import mongoose from "mongoose";
+import { application, getAllApplications, updateApplicationStatus, getApplicationById, findApprovedTutors, toggleTutorActiveStatus, findApplicationByUserId } from "../repositories/tutor.repository.js";
+import { updateUserRole } from "../repositories/user.repository.js";
 
 
+
+export const getMyApplication = async (req, res) => {
+  try {
+    const application = await findApplicationByUserId(req.user.id);
+    if (!application) {
+      return res.status(404).json({success: false, hasApplied: false, application: null });
+    }
+    return res.status(200).json({ success: true, hasApplied: true, application });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Server error', error: error.message });
+  }
+};
 
 export const submitApplication = async (req, res) => {
     try {
+        console.log('first')
         const {
             fullName,
             bio,
             skills,
             experience,
             categories,
-            linkedIn,
+            linkedin,
             portfolio,
         } = req.body;
-
-
         if (!fullName || !bio || !skills || !experience || !categories) {
             return res.status(400).json({
                 success: false,
@@ -33,18 +46,19 @@ export const submitApplication = async (req, res) => {
                 message: "Invalid format for skills or categories"
             })
         }
-
+console.log(req.user, 'req.user')
         const result = await application({
             fullName,
             bio,
             skills: parsedSkills,
             experience,
             categories: parsedCategories,
-            linkedIn: linkedIn || '',
+            linkedin: linkedin || '',
             portfolio: portfolio || '',
             profilePhotoUrl: req.file?.path || null,
-            userId: req.user || null
+            userId: req.user.id || req.user
         })
+        console.log(result, 'result')
 
         return res.status(201).json({
             success: true,
@@ -70,11 +84,9 @@ export const submitApplication = async (req, res) => {
 // Query param: ?status=pending | approved | rejected | under_review | all
 export const getApplications = async (req, res) => {
     try {
-        console.log('333333333333333')
         const { status } = req.query;
 
         const applications = await getAllApplications(status || null);
-        console.log(applications, 'applications')
 
         const shaped = applications.map((app) => ({
             _id: app._id,
@@ -90,7 +102,7 @@ export const getApplications = async (req, res) => {
             status: app.status,
             createdAt: app.createdAt,
         }));
-        console.log(shaped,'shaped')
+        // console.log(shaped,'shaped')
 
         return res.status(200).json({
             success: true,
@@ -108,19 +120,32 @@ export const getApplications = async (req, res) => {
 
 // ── PATCH /admin/tutor-applications/:id/approve ───────────────────────────
 export const approveApplication = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
         const { id } = req.params;
 
         const existing = await getApplicationById(id);
         if (!existing) {
+            await session.abortTransaction();
             return res.status(404).json({ success: false, message: "Application not found." });
         }
 
-        if (existing === "approved") {
+        if (existing.status === "approved") {
+            await session.abortTransaction();
             return res.status(400).json({ success: false, message: "Application is already approved." });
         }
 
         const updated = await updateApplicationStatus(id, "approved");
+
+        if (!existing.userId) {
+            await session.abortTransaction();
+            return res.status(404).json({ success: false, message: "No user linked to this application." });
+        }
+
+        await updateUserRole(existing.userId, "instructor");
+
+        await session.commitTransaction();
 
         return res.status(200).json({
             success: true,
@@ -139,10 +164,13 @@ export const approveApplication = async (req, res) => {
             },
         });
     } catch (error) {
+        session.abortTransaction();
         console.error("approveApplication error:", error);
         return res
             .status(500)
             .json({ success: false, message: "Server error. Please try again later." });
+    } finally {
+        session.endSession();
     }
 }
 
@@ -186,3 +214,58 @@ export const rejectApplication = async (req, res) => {
             .json({ success: false, message: "Server error. Please try again later." });
     }
 }
+
+
+
+
+// GET /admin/list-tutors
+export const getApprovedTutors = async (req, res) => {
+    try {
+        console.log('111111111111')
+        const tutors = await findApprovedTutors();
+        const formatted = tutors.map((t) => ({
+            _id:      t._id,
+            fullName: t.fullName,
+            email:    t.userId?.email    ?? "",
+            photo:    t.profilePhotoUrl  ?? t.userId?.profilePhoto ?? null,
+            categories: t.categories,
+            experience: t.experience,
+            isBlocked: t.userId?.isBlocked ?? true,
+            joined:   t.createdAt,
+        }));
+        // console.log(formatted, 'formatted tutors')
+
+        return res.status(200).json({ tutors: formatted });
+    } catch (error) {
+        console.error("getApprovedTutors error:", error);
+        return res.status(500).json({ message: "Failed to fetch tutors." });
+    }
+};
+
+// PATCH /admin/tutors/:id/toggle-status
+export const toggleTutorStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updated = await toggleTutorActiveStatus(id);
+
+        if (!updated) {
+            return res.status(404).json({ message: "Tutor not found." });
+        }
+console.log(updated,'updated')
+        const tutor = {
+            _id:      updated._id,
+            fullName: updated.fullName,
+            email:    updated.userId?.email    ?? "",
+            photo:    updated.profilePhotoUrl  ?? null,
+            categories: updated.categories,
+            experience: updated.experience,
+            isBlocked: updated.userId?.isBlocked ?? true,
+            joined:   updated.createdAt,
+        };
+
+        return res.status(200).json({ tutor });
+    } catch (error) {
+        console.error("toggleTutorStatus error:", error);
+        return res.status(500).json({ message: "Failed to update tutor status." });
+    }
+};
