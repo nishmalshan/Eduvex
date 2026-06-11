@@ -5,12 +5,14 @@ import { fetchMyApplication } from '../../../redux/features/tutorApplicationSlic
 import TutorApplicationForm from '../../../components/tutor/TutorApplicationForm';
 import ApplicationUnderReview from '../../../components/common/layout/ApplicationUnderReview';
 import Loader from '../../../components/common/layout/Loader';
+import CourseTable from '../dashboard/Coursetable';
 
 const TutorApplicationPage = () => {
   const dispatch = useDispatch();
   const { myApplication, hasApplied, loading } = useSelector(
     (state) => state.tutorApplications
   );
+  console.log(myApplication, 'myApplication');
 
   useEffect(() => {
     dispatch(fetchMyApplication());
@@ -18,8 +20,12 @@ const TutorApplicationPage = () => {
 
   if (loading || hasApplied === null) return <Loader />;
 
-  if (hasApplied && myApplication) {
+  if (hasApplied && myApplication && myApplication.status === 'pending') {
     return <ApplicationUnderReview application={myApplication} />;
+  } else if (hasApplied && myApplication && myApplication.status === 'rejected') {
+    return <TutorApplicationForm />;
+  } else if (hasApplied && myApplication && myApplication.status === 'approved') {
+    return <CourseTable application={myApplication} />;
   }
 
   return <TutorApplicationForm />;

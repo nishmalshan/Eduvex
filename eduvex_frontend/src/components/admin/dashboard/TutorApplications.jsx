@@ -151,9 +151,6 @@ const TutorApplications = () => {
   const [page,     setPage]     = useState(1);
   const [selected, setSelected] = useState(null);
 
-  useEffect(() => {
-    dispatch(fetchTutorApplications());
-  }, [dispatch]);
 
   // ── Derived ──────────────────────────────────────────────────────────────
   const filtered = useMemo(() => {

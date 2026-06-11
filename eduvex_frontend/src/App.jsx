@@ -19,21 +19,23 @@ import TutorsList from './components/admin/dashboard/TutorsList'
 import UsersPage from './pages/admin/UsersPage'
 import CoursesPage from './pages/admin/CoursesPage'
 import TutorApplicationPage from './components/tutor/home/TutorApplicationPage'
+import Tutoronboarding from './components/tutor/home/Tutoronboarding'
 
 function App() {
   const dispatch = useDispatch()
   const isUserAuth = useSelector((state) => state.auth.isAuthenticated)
   const isAdminAuth = useSelector((state) => state.adminAuth.isAuthenticated)
+  const isApprovedTutor = useSelector((state) => state.tutorApplications)
   const [loading, setLoading] = useState(true)
   // console.log(isUserAuth, 'isUserAuth')
-  console.log(isAdminAuth, 'isAdminAuth')
+  // console.log(isAdminAuth, 'isAdminAuth')
 
   useEffect(() => {
 
     const checkAuth = async () => {
       try {
         const response = await API_URL.get("/check-auth");
-        console.log(response, 'user check-auth response')
+        // console.log(response, 'user check-auth response')
         if (response.status === 200) {
           dispatch(loginSuccess({
             user: response.data.user
@@ -47,9 +49,8 @@ function App() {
     
     const checkAdminAuth = async () => {
       try {
-        console.log('check admin')
         const response = await API_URL.get("/admin/check-auth");
-        console.log(response, 'admin check-auth response')
+        // console.log(response, 'admin check-auth response')
         if (response.status === 200) {
           dispatch(adminAuthSuccess({
             admin: response.data.admin
@@ -93,6 +94,10 @@ function App() {
       path='/tutor/application'
       element={isUserAuth ? <TutorApplicationPage /> : <Navigate to="/login" replace />}
     />
+    {/* <Route
+    path='/tutor/dashboard'
+    element={isUserAuth ? <Tutoronboarding /> : <Navigate to="/login" replace />}
+    /> */}
 
     {/* Admin Login */}
     <Route

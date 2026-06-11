@@ -1,7 +1,6 @@
-import { useState, useRef, useEffect } from "react";
-import {NavIcon, icons} from "../AdminSidebar";
+import { useState } from "react";
+import { NavIcon } from "../AdminSidebar";
 import "./AdminDashboard.css";
-
 
 // ─── Chart data ────────────────────────────────────────────────────────────
 const chartData = {
@@ -41,7 +40,6 @@ function LineChart({ data, color, gradientId }) {
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
       </defs>
-      {/* Grid lines */}
       {[0, 0.25, 0.5, 0.75, 1].map((t, i) => {
         const y = PAD.top + t * (H - PAD.top - PAD.bottom);
         const val = max - t * range;
@@ -52,15 +50,11 @@ function LineChart({ data, color, gradientId }) {
           </g>
         );
       })}
-      {/* Area fill */}
       <path d={area} fill={`url(#${gradientId})`} />
-      {/* Line */}
       <polyline points={polyline} fill="none" stroke={color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
-      {/* Dots */}
       {points.map(([x, y], i) => (
         <circle key={i} cx={x} cy={y} r="3" fill={color} stroke="rgba(13,15,20,0.8)" strokeWidth="1.5" />
       ))}
-      {/* X labels */}
       {data.labels.map((label, i) => (
         <text key={i} x={points[i][0]} y={H - 4} textAnchor="middle" fontSize="9" fill="rgba(255,255,255,0.3)">
           {label}
@@ -112,8 +106,8 @@ function ChartCard({ title, type, color, gradientId, formatValue, onDownload }) 
 const stats = [
   { label: "Total Users",        value: "12,483", icon: "users",   color: "blue",  sub: "+8.2% vs last month" },
   { label: "Active Courses",     value: "1,094",  icon: "courses", color: "green", sub: "+14.5% vs last month" },
-  { label: "Tutor Applications", value: "38", icon: "tutors",  color: "amber", sub: "pending review" },
-  { label: "Monthly Revenue",    value: "₹4.2L", icon: "revenue", color: "red", sub: "vs last month" },
+  { label: "Tutor Applications", value: "38",     icon: "tutors",  color: "amber", sub: "pending review" },
+  { label: "Monthly Revenue",    value: "₹4.2L",  icon: "revenue", color: "red",   sub: "vs last month" },
 ];
 
 const recentApps = [
@@ -153,177 +147,137 @@ function downloadCSV(type, period) {
   URL.revokeObjectURL(url);
 }
 
-// ─── Main Dashboard ───────────────────────────────────────────────────────
+// ─── Dashboard content only — layout shell lives in AdminLayout ──────────
 const AdminDashboard = () => {
-  const [active,      setActive]      = useState("home");
-  // const [collapsed,   setCollapsed]   = useState(false);
-  const [mobileOpen,  setMobileOpen]  = useState(false);
-
-
-  
-
   return (
-    <div className="adm-root">
-      {mobileOpen && <div className="adm-overlay" onClick={() => setMobileOpen(false)} />}
+    <>
+      {/* Alerts */}
+      <div className="adm-alerts">
+        {alerts.map((a, i) => (
+          <div key={i} className={`adm-alert adm-alert--${a.type}`}>
+            <NavIcon name={a.type === "warning" ? "warning" : a.type === "success" ? "check" : "bell"} size={14} />
+            <span>{a.msg}</span>
+          </div>
+        ))}
+      </div>
 
-      {/* <AdminSidebar
-        active={active} setActive={setActive}
-        collapsed={collapsed} setCollapsed={setCollapsed}
-        mobileOpen={mobileOpen} setMobileOpen={setMobileOpen}
-      /> */}
-
-      <div className="adm-main">
-        {/* Topbar */}
-        <header className="adm-topbar">
-          <div className="adm-topbar-left">
-            <button className="adm-mobile-menu-btn" onClick={() => setMobileOpen(true)}>
-              <NavIcon name="menu" size={20} />
-            </button>
-            <div>
-              <h1 className="adm-page-title">Dashboard</h1>
-              <p className="adm-page-sub">Welcome back, Super Admin 👋</p>
+      {/* Stat cards */}
+      <section className="adm-stats-grid">
+        {stats.map((s, i) => (
+          <div key={i} className={`adm-stat-card adm-stat-card--${s.color}`}>
+            <div className="adm-stat-header">
+              <div className={`adm-stat-icon-wrap adm-stat-icon-wrap--${s.color}`}>
+                <NavIcon name={s.icon} size={18} />
+              </div>
             </div>
+            <p className="adm-stat-value">{s.value}</p>
+            <p className="adm-stat-label">{s.label}</p>
+            <p className="adm-stat-sub">{s.sub}</p>
           </div>
-          <div className="adm-topbar-right">
-            <button className="adm-icon-btn">
-              <NavIcon name="bell" size={18} />
-              <span className="adm-notif-dot" />
-            </button>
-            <div className="adm-avatar adm-avatar--lg">A</div>
+        ))}
+      </section>
+
+      {/* Charts row */}
+      <div className="adm-charts-row">
+        <ChartCard
+          title="Revenue"
+          type="revenue"
+          color="#3b82f6"
+          gradientId="revGrad"
+          formatValue={(v) => v >= 100000 ? `₹${(v/100000).toFixed(1)}L` : `₹${v.toLocaleString()}`}
+          onDownload={() => downloadCSV("revenue", "monthly")}
+        />
+        <ChartCard
+          title="Enrolled Students"
+          type="students"
+          color="#22c55e"
+          gradientId="stuGrad"
+          formatValue={(v) => v >= 1000 ? `${(v/1000).toFixed(1)}k` : v.toString()}
+          onDownload={() => downloadCSV("students", "monthly")}
+        />
+      </div>
+
+      {/* Lower grid */}
+      <div className="adm-lower-grid">
+        {/* Tutor applications */}
+        <section className="adm-card adm-card--applications">
+          <div className="adm-card-header">
+            <h2 className="adm-card-title">Tutor Applications</h2>
+            <button className="adm-view-all">View all →</button>
           </div>
-        </header>
-
-        <main className="adm-content">
-
-          {/* Alerts */}
-          <div className="adm-alerts">
-            {alerts.map((a, i) => (
-              <div key={i} className={`adm-alert adm-alert--${a.type}`}>
-                <NavIcon name={a.type === "warning" ? "warning" : a.type === "success" ? "check" : "bell"} size={14} />
-                <span>{a.msg}</span>
-              </div>
-            ))}
+          <div className="adm-table-wrap">
+            <table className="adm-table">
+              <thead>
+                <tr><th>Name</th><th>Subject</th><th>Applied</th><th>Status</th><th>Action</th></tr>
+              </thead>
+              <tbody>
+                {recentApps.map((app, i) => (
+                  <tr key={i}>
+                    <td>
+                      <div className="adm-tutor-cell">
+                        <div className="adm-avatar adm-avatar--sm">{app.name[0]}</div>
+                        {app.name}
+                      </div>
+                    </td>
+                    <td>{app.subject}</td>
+                    <td className="adm-muted">{app.date}</td>
+                    <td><span className={`adm-pill adm-pill--${app.status}`}>{app.status}</span></td>
+                    <td>
+                      {app.status === "pending" && (
+                        <div className="adm-action-btns">
+                          <button className="adm-btn-approve">✓</button>
+                          <button className="adm-btn-reject">✕</button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
+        </section>
 
-          {/* Stat cards — no trend graphs, just clean numbers */}
-          <section className="adm-stats-grid">
-            {stats.map((s, i) => (
-              <div key={i} className={`adm-stat-card adm-stat-card--${s.color}`}>
-                <div className="adm-stat-header">
-                  <div className={`adm-stat-icon-wrap adm-stat-icon-wrap--${s.color}`}>
-                    <NavIcon name={s.icon} size={18} />
+        {/* Right col */}
+        <div className="adm-right-col">
+          <section className="adm-card">
+            <div className="adm-card-header">
+              <h2 className="adm-card-title">Top Courses</h2>
+              <NavIcon name="star" size={15} />
+            </div>
+            <div className="adm-course-list">
+              {topCourses.map((c, i) => (
+                <div key={i} className="adm-course-item">
+                  <div className="adm-course-rank">#{i + 1}</div>
+                  <div className="adm-course-info">
+                    <p className="adm-course-title">{c.title}</p>
+                    <p className="adm-course-meta">{c.students.toLocaleString()} students</p>
                   </div>
+                  <div className="adm-course-rating">⭐ {c.rating}</div>
                 </div>
-                <p className="adm-stat-value">{s.value}</p>
-                <p className="adm-stat-label">{s.label}</p>
-                <p className="adm-stat-sub">{s.sub}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </section>
 
-          {/* Charts row */}
-          <div className="adm-charts-row">
-            <ChartCard
-              title="Revenue"
-              type="revenue"
-              color="#3b82f6"
-              gradientId="revGrad"
-              formatValue={(v) => v >= 100000 ? `₹${(v/100000).toFixed(1)}L` : `₹${v.toLocaleString()}`}
-              onDownload={() => downloadCSV("revenue", "monthly")}
-            />
-            <ChartCard
-              title="Enrolled Students"
-              type="students"
-              color="#22c55e"
-              gradientId="stuGrad"
-              formatValue={(v) => v >= 1000 ? `${(v/1000).toFixed(1)}k` : v.toString()}
-              onDownload={() => downloadCSV("students", "monthly")}
-            />
-          </div>
-
-          {/* Lower grid */}
-          <div className="adm-lower-grid">
-            {/* Tutor applications */}
-            <section className="adm-card adm-card--applications">
-              <div className="adm-card-header">
-                <h2 className="adm-card-title">Tutor Applications</h2>
-                <button className="adm-view-all">View all →</button>
-              </div>
-              <div className="adm-table-wrap">
-                <table className="adm-table">
-                  <thead>
-                    <tr><th>Name</th><th>Subject</th><th>Applied</th><th>Status</th><th>Action</th></tr>
-                  </thead>
-                  <tbody>
-                    {recentApps.map((app, i) => (
-                      <tr key={i}>
-                        <td>
-                          <div className="adm-tutor-cell">
-                            <div className="adm-avatar adm-avatar--sm">{app.name[0]}</div>
-                            {app.name}
-                          </div>
-                        </td>
-                        <td>{app.subject}</td>
-                        <td className="adm-muted">{app.date}</td>
-                        <td><span className={`adm-pill adm-pill--${app.status}`}>{app.status}</span></td>
-                        <td>
-                          {app.status === "pending" && (
-                            <div className="adm-action-btns">
-                              <button className="adm-btn-approve">✓</button>
-                              <button className="adm-btn-reject">✕</button>
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            {/* Right col */}
-            <div className="adm-right-col">
-              <section className="adm-card">
-                <div className="adm-card-header">
-                  <h2 className="adm-card-title">Top Courses</h2>
-                  <NavIcon name="star" size={15} />
-                </div>
-                <div className="adm-course-list">
-                  {topCourses.map((c, i) => (
-                    <div key={i} className="adm-course-item">
-                      <div className="adm-course-rank">#{i + 1}</div>
-                      <div className="adm-course-info">
-                        <p className="adm-course-title">{c.title}</p>
-                        <p className="adm-course-meta">{c.students.toLocaleString()} students</p>
-                      </div>
-                      <div className="adm-course-rating">⭐ {c.rating}</div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              <section className="adm-card">
-                <div className="adm-card-header"><h2 className="adm-card-title">Quick Actions</h2></div>
-                <div className="adm-quick-actions">
-                  {[
-                    { label: "Add Course",   icon: "courses", color: "blue" },
-                    { label: "Manage Users", icon: "users",   color: "green" },
-                    { label: "View Reports", icon: "reports", color: "amber" },
-                    { label: "Settings",     icon: "settings",color: "slate" },
-                  ].map((qa, i) => (
-                    <button key={i} className={`adm-qa-btn adm-qa-btn--${qa.color}`}>
-                      <NavIcon name={qa.icon} size={16} />
-                      <span>{qa.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </section>
+          <section className="adm-card">
+            <div className="adm-card-header"><h2 className="adm-card-title">Quick Actions</h2></div>
+            <div className="adm-quick-actions">
+              {[
+                { label: "Add Course",   icon: "courses",  color: "blue" },
+                { label: "Manage Users", icon: "users",    color: "green" },
+                { label: "View Reports", icon: "reports",  color: "amber" },
+                { label: "Settings",     icon: "settings", color: "slate" },
+              ].map((qa, i) => (
+                <button key={i} className={`adm-qa-btn adm-qa-btn--${qa.color}`}>
+                  <NavIcon name={qa.icon} size={16} />
+                  <span>{qa.label}</span>
+                </button>
+              ))}
             </div>
-          </div>
-        </main>
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
-}
+};
 
-export default AdminDashboard
+export default AdminDashboard;

@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import { logoutAdmin } from "../../redux/features/adminAuthSlice";
 import "./dashboard/AdminDashboard.css";
@@ -30,7 +30,7 @@ export const NavIcon = ({ name, size }) => <Icon d={icons[name]} size={size} />;
 
 const mainNav = [
   { id: "dashboard",      label: "Dashboard",          icon: "home" },
-  { id: "tutors",    label: "Tutor Applications", icon: "tutors", badge: 8 },
+  { id: "tutors",    label: "Tutor Applications", icon: "tutors", badge: null },
   { id: "tutorList", label: "Tutors List",        icon: "tutorList" },
   { id: "users",     label: "Users",              icon: "users" },
   { id: "courses",   label: "Courses",            icon: "courses" },
@@ -43,6 +43,10 @@ const secondaryNav = [
 ];
 
 const AdminSidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) => {
+
+  const tutors = useSelector((state) => state.tutorApplications.applications);
+  const pendingCount = tutors ? tutors.filter(t => t.status === 'pending').length : 0;
+  mainNav[1].badge = pendingCount > 0 ? pendingCount : null;
 
     const dispatch = useDispatch();
     const navigate = useNavigate();

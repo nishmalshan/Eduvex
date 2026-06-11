@@ -62,7 +62,8 @@
   height: 100vh;
   flex-shrink: 0;
   overflow: hidden;
-  /* keep rest of your existing sidebar rules */
+  display: flex;
+  flex-direction: column;
 }
 
 .adm-sidebar--collapsed {
