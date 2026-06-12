@@ -3,9 +3,10 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyApplication } from '../../../redux/features/tutorApplicationSlice';
 import TutorApplicationForm from '../../../components/tutor/TutorApplicationForm';
-import ApplicationUnderReview from '../../../components/common/layout/ApplicationUnderReview';
+import ApplicationUnderReview from '../../../components/user/ApplicationUnderReview';
 import Loader from '../../../components/common/layout/Loader';
 import CourseTable from '../dashboard/Coursetable';
+import TutorOnboarding from './Tutoronboarding';
 
 const TutorApplicationPage = () => {
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ const TutorApplicationPage = () => {
   } else if (hasApplied && myApplication && myApplication.status === 'rejected') {
     return <TutorApplicationForm />;
   } else if (hasApplied && myApplication && myApplication.status === 'approved') {
-    return <CourseTable application={myApplication} />;
+    return <TutorOnboarding />;
   }
 
   return <TutorApplicationForm />;
