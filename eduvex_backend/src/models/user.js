@@ -17,12 +17,21 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: function () {
                 return !this.googleId;
+            },
+            required: function () {
+                return !this.facebookId;
             }
+        },
+        provider: {
+            type: String,
+            enum: ["google", "facebook"]
         },
         googleId: {
             type: String
         },
-
+        facebookId: {
+            type: String
+        }, 
         role: {
             type: String,
             enum: ["student", "instructor", "admin"],

@@ -1,4 +1,5 @@
 import TutorApplication from "../models/TutorApplication.js";
+import TutorProfile from "../models/TutorProfile.js";
 
 export const application = async (applicationData) => {
     try {
@@ -61,4 +62,21 @@ export const toggleTutorActiveStatus = async (tutorId) => {
 
 export const findApplicationByUserId = async (userId) => {
   return TutorApplication.findOne({ userId }).lean();
+};
+
+export const createTutorProfile = async (profileData) => {
+  return TutorProfile.create(profileData);
+
+};
+ 
+export const findTutorProfileByUserId = async (userId) => {
+  return TutorProfile.findOne({ userId });
+};
+
+export const completeTutorOnboarding = async (userId) => {
+  return TutorProfile.findOneAndUpdate(
+    { userId },
+    { onboardingCompleted: true },
+    { new: true }
+  );
 };

@@ -2,18 +2,17 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchMyApplication } from '../../../redux/features/tutorApplicationSlice';
-import TutorApplicationForm from '../../../components/tutor/TutorApplicationForm';
-import ApplicationUnderReview from '../../../components/user/ApplicationUnderReview';
-import Loader from '../../../components/common/layout/Loader';
+import TutorApplicationForm from '../TutorApplicationForm';
+import ApplicationUnderReview from '../../user/ApplicationUnderReview';
+import Loader from '../../common/layout/Loader';
 import CourseTable from '../dashboard/Coursetable';
 import TutorOnboarding from './Tutoronboarding';
+import { selectOnboardingCompleted } from '../../../redux/features/courseSlice';
 
 const TutorApplicationPage = () => {
   const dispatch = useDispatch();
-  const { myApplication, hasApplied, loading } = useSelector(
-    (state) => state.tutorApplications
-  );
-  console.log(myApplication, 'myApplication');
+  const { myApplication, hasApplied, loading } = useSelector( (state) => state.tutorApplications );
+  const onboardingCompleted = useSelector((state) => state.auth.onboardingCompleted)
 
   useEffect(() => {
     dispatch(fetchMyApplication());
@@ -26,7 +25,11 @@ const TutorApplicationPage = () => {
   } else if (hasApplied && myApplication && myApplication.status === 'rejected') {
     return <TutorApplicationForm />;
   } else if (hasApplied && myApplication && myApplication.status === 'approved') {
-    return <TutorOnboarding />;
+    if (!onboardingCompleted) {
+      return <TutorOnboarding />;
+    } else {
+      return <CourseTable />;
+    }
   }
 
   return <TutorApplicationForm />;

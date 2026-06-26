@@ -1,7 +1,8 @@
 // components/tutor/TutorOnboarding.jsx
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { completeOnboarding } from "../../../redux/features/courseSlice";
+import { useNavigate } from "react-router-dom";
+import { completeOnboardingThunk } from "../../../redux/features/authSlice";
 
 const slides = [
   {
@@ -60,8 +61,10 @@ const slides = [
 
 export default function TutorOnboarding() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
   const [exiting, setExiting] = useState(false);
+  const [finishing, setFinishing] = useState(false);
 
   const slide = slides[current];
   const isLast = current === slides.length - 1;
@@ -75,9 +78,15 @@ export default function TutorOnboarding() {
     }, 250);
   };
 
+  const finish = async () => {
+    setFinishing(true);
+    await dispatch(completeOnboardingThunk());
+    navigate("/tutor/dashboard", { replace: true });
+  };
+
   const handleNext = () => {
     if (isLast) {
-      dispatch(completeOnboarding());
+      finish();
     } else {
       goTo(current + 1);
     }
@@ -147,7 +156,8 @@ export default function TutorOnboarding() {
             {/* Actions */}
             <div className="flex items-center justify-between gap-4">
               <button
-                onClick={() => dispatch(completeOnboarding())}
+                onClick={ finish }
+                disabled={finishing}
                 className="text-sm text-gray-400 hover:text-gray-600 transition-colors underline underline-offset-2"
               >
                 Skip for now
@@ -164,9 +174,10 @@ export default function TutorOnboarding() {
                 )}
                 <button
                   onClick={handleNext}
+                  disabled={finishing}
                   className={`px-7 py-2.5 rounded-xl text-white text-sm font-semibold bg-gradient-to-r ${slide.color} hover:opacity-90 transition-all shadow-md hover:shadow-lg active:scale-95`}
                 >
-                  {isLast ? "Get Started →" : "Next →"}
+                  {finishing ? "Loading..." : isLast ?   "Get Started →" : "Next →"}
                 </button>
               </div>
             </div>

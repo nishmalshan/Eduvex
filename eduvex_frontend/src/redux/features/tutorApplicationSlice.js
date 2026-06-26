@@ -15,7 +15,6 @@ export const fetchMyApplication = createAsyncThunk(
     'tutorApplications/fetchMine',
     async (_, { rejectWithValue }) => {
         try {
-            console.log('22222222222222111111')
             const response = await API_URL.get('/tutor/my-application');
             console.log(response.data, 'my application response')
             return response.data; // { hasApplied: bool, application: {...} | null }

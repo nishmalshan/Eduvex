@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { loginSuccess } from '../../../redux/features/authSlice';
 import { useDispatch } from 'react-redux';
 
-const GoogleSuccess = () => {
+const OAuthSuccess = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
     useEffect(() => {
+        console.log('66666666666666666666666666')
         // Extract the token from the URL
         const params = new URLSearchParams(window.location.search);
         console.log(params,'params')
@@ -17,6 +17,7 @@ const GoogleSuccess = () => {
         const name = params.get("name");
         const email = params.get("email");
         const isBlocked = params.get("isBlocked");
+        console.log(params, 'params 77777777777777777777777')
 
 
         const user = {
@@ -25,7 +26,7 @@ const GoogleSuccess = () => {
             email,
             isBlocked
         };
-        console.log(user,'google auth user')
+        console.log(user,'oauth auth user')
 
         if (user && token) {
             console.log('gggg11111111')
@@ -33,7 +34,7 @@ const GoogleSuccess = () => {
                 user,
                 token
             }))
-            navigate("/");
+            navigate("/" , { replace: true });
         }
     }, []);
 
@@ -41,4 +42,4 @@ const GoogleSuccess = () => {
     return <div>Signing you in...</div>
 }
 
-export default GoogleSuccess
+export default OAuthSuccess

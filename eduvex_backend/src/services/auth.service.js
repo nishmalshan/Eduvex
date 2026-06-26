@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { findUserByEmail, createUser, findUserByGoogleId } from "../repositories/user.repository.js";
+import { findUserByEmail, createUser, findUserByGoogleId, findUserByFacebookId } from "../repositories/user.repository.js";
 import { generateToken } from "../utils/generateToken.js"
 
 
@@ -56,33 +56,58 @@ export const loginService = async ({ email, password }) => {
     }
 }
 
-export const googleAuthService = async (data) => {
+export const OAuthService = async (data) => {
     try {
         let user;
 
-        // Check user with googleId
-        user = await findUserByGoogleId(data.googleId);
+        if (data.provider === 'google') {
 
-        // If not found check with email
-        if (!user) {
-            user = await findUserByEmail(data.email);
-            // User exists with email signup
-            if (user) {
-                user.googleId = data.googleId;
-                await user.save();
+            user = await findUserByGoogleId(data.googleId);
+
+            if (!user) {
+                user = await findUserByEmail(data.email);
+                if (user) {
+                    // Existing account (email/password or Facebook) — link Google
+                    user.googleId = data.googleId;
+                    await user.save();
+                }
             }
-        }
 
-        if (!user) {
-            const newUser = await createUser({
-                googleId: data.googleId,
-                fullName: data.fullName,
-                email: data.email
-            });
-            return { user: newUser };
+            if (!user) {
+                user = await createUser({
+                    googleId: data.googleId,
+                    fullName: data.fullName,
+                    email:    data.email,
+                });
+            }
+
+        } else if (data.provider === 'facebook') {
+
+            user = await findUserByFacebookId(data.facebookId);
+
+            if (!user) {
+                user = await findUserByEmail(data.email);
+                if (user) {
+                    // Existing account (email/password or Google) — link Facebook
+                    user.facebookId = data.facebookId;
+                    await user.save();
+                }
+            }
+
+            if (!user) {
+                user = await createUser({
+                    facebookId: data.facebookId,
+                    fullName:   data.fullName,
+                    email:      data.email,
+                });
+            }
+
+        } else {
+            throw new Error(`Unsupported OAuth provider: ${data.provider}`);
         }
 
         return { user };
+
     } catch (error) {
         throw new Error(error.message);
     }

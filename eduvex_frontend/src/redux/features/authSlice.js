@@ -7,6 +7,7 @@ const initialState = {
     user: null,
     token: null,
     isAuthenticated: false,
+    onboardingCompleted: null,
 };
 
 
@@ -16,7 +17,7 @@ export const registerUser = createAsyncThunk(
     async (formData, thunkAPI) => {
         try {
             const response = await API_URL.post("/signup", formData);
-            console.log(response.data,'register slice response')
+            console.log(response.data, 'register slice response')
             return response.data
         } catch (error) {
             return thunkAPI.rejectWithValue(
@@ -43,6 +44,19 @@ export const loginUser = createAsyncThunk(
 )
 
 
+export const completeOnboardingThunk = createAsyncThunk(
+    "auth/completeOnboarding",
+    async (_, { rejectWithValue }) => {
+        try {
+            await API_URL.patch("/tutor/complete-onboarding");
+            return true;
+        } catch (err) {
+            return rejectWithValue(err.response?.data?.message || "Failed to complete onboarding");
+        }
+    }
+);
+
+
 // Async thunk for logout user
 export const logoutUser = createAsyncThunk(
     "auth/logoutUser",
@@ -59,15 +73,23 @@ const authSlice = createSlice({
             state.user = action.payload.user;
             state.token = action.payload.token || null;
             state.isAuthenticated = true;
+            if (action.payload.user?.onboardingCompleted !== undefined) {
+                state.onboardingCompleted = action.payload.user.onboardingCompleted;
+            }
         },
         logout: (state) => {
             state.user = null;
             state.token = null;
             state.isAuthenticated = false;
+            state.onboardingCompleted = null;
         }
     },
     extraReducers: (builder) => {
         builder
+
+            .addCase(completeOnboardingThunk.fulfilled, (state) => {
+                state.onboardingCompleted = true;
+            })
 
             // Signup
             .addCase(registerUser.pending, (state) => {
@@ -76,7 +98,7 @@ const authSlice = createSlice({
             })
 
             .addCase(registerUser.fulfilled, (state, action) => {
-                console.log(action,'register action')
+                console.log(action, 'register action')
                 state.loading = false
                 state.user = action.payload.user
                 state.token = action.payload.token || null

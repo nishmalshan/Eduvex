@@ -70,6 +70,15 @@ const Login = () => {
     }
   }
 
+  const handleFacebookLogin = () => {
+    try {
+      console.log('111111111111111111111111111111')
+      window.location.href = "http://localhost:5000/auth/facebook";
+    } catch (error) {
+      setError("Facebook login failed");
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-xl overflow-hidden w-full max-w-4xl flex flex-col md:flex-row">
@@ -208,7 +217,10 @@ const Login = () => {
             </button>
 
             {/* Facebook */}
-            <button className="flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 active:scale-95 text-slate-700 text-sm font-semibold shadow-sm transition-all duration-150">
+            <button 
+            className="flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 active:scale-95 text-slate-700 text-sm font-semibold shadow-sm transition-all duration-150"
+            onClick={handleFacebookLogin}
+            >
               <svg className="w-5 h-5" viewBox="0 0 32 32" fill="#1877F2">
                 <path d="M32 16C32 7.163 24.837 0 16 0S0 7.163 0 16c0 7.986 5.85 14.602 13.5 15.806V20.625H9.438V16H13.5v-3.525c0-4.01 2.389-6.225 6.043-6.225 1.751 0 3.582.313 3.582.313v3.938h-2.018c-1.988 0-2.607 1.234-2.607 2.5V16h4.438l-.709 4.625H18.5v11.181C26.15 30.602 32 23.986 32 16z"/>
               </svg>

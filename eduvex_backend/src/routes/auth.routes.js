@@ -1,5 +1,5 @@
 import express from "express";
-import { checkAuth, signup, loginUser, logoutUser, googleAuthCallback } from "../controllers/auth.controller.js";
+import { checkAuth, signup, loginUser, logoutUser, googleAuthCallback, facebookAuthCallback, completeOAuthProfile } from "../controllers/auth.controller.js";
 import { signupValidation, validate } from "../middlewares/validate.middleware.js";
 import { protectUser } from "../middlewares/protectUser.js";
 import passport from "passport";
@@ -18,10 +18,23 @@ router.post("/logout", logoutUser)
 // Google OAuth routes
 router.get("/auth/google", passport.authenticate("google", {scope: ["profile", "email"], prompt: "select_account" }));
 router.get("/auth/google/callback", passport.authenticate("google", {
-    session: false,
+    // session: false,
     failureRedirect: "/login"
 }),
 googleAuthCallback
 );
+
+
+// Facebook OAuth routes
+router.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+
+// Facebook OAuth callback
+router.get('/auth/facebook/callback', passport.authenticate('facebook', {
+    // session: false,
+    failureRedirect: '/login'
+}),
+    facebookAuthCallback
+);
+router.post('/complete-profile', completeOAuthProfile);
 
 export default router;

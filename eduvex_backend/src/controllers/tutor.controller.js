@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { application, getAllApplications, updateApplicationStatus, getApplicationById, findApprovedTutors, toggleTutorActiveStatus, findApplicationByUserId } from "../repositories/tutor.repository.js";
+import { application, getAllApplications, updateApplicationStatus, getApplicationById, findApprovedTutors, toggleTutorActiveStatus, findApplicationByUserId, findTutorProfileByUserId, createTutorProfile, completeTutorOnboarding } from "../repositories/tutor.repository.js";
 import { updateUserRole } from "../repositories/user.repository.js";
 
 
@@ -123,6 +123,7 @@ export const approveApplication = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
+        console.log(session,'session')
         const { id } = req.params;
 
         const existing = await getApplicationById(id);
@@ -136,14 +137,34 @@ export const approveApplication = async (req, res) => {
             return res.status(400).json({ success: false, message: "Application is already approved." });
         }
 
-        const updated = await updateApplicationStatus(id, "approved");
-
+        
         if (!existing.userId) {
             await session.abortTransaction();
             return res.status(404).json({ success: false, message: "No user linked to this application." });
         }
 
+        const updated = await updateApplicationStatus(id, "approved");
+
         await updateUserRole(existing.userId, "instructor");
+
+        const existingProfile = await findTutorProfileByUserId(existing.userId);
+    if (!existingProfile) {
+      await createTutorProfile(
+        {
+          userId: existing.userId,
+          applicationId: existing._id,
+          fullName: existing.fullName,
+          bio: existing.bio,
+          skills: existing.skills,
+          experience: existing.experience,
+          categories: existing.categories,
+          profilePhotoUrl: existing.profilePhotoUrl,
+          linkedin: existing.linkedin,
+          portfolio: existing.portfolio,
+          onboardingCompleted: false,
+        }
+      );
+    }
 
         await session.commitTransaction();
 
@@ -215,6 +236,19 @@ export const rejectApplication = async (req, res) => {
     }
 }
 
+
+export const completeOnboarding = async (req, res) => {
+  try {
+    const profile = await completeTutorOnboarding(req.user.id);
+    console.log(profile,'profile')
+    if (!profile) {
+      return res.status(404).json({ success: false, message: "Tutor profile not found." });
+    }
+    return res.status(200).json({ success: true, onboardingCompleted: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Server error." });
+  }
+};
 
 
 

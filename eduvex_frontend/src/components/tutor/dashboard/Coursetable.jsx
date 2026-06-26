@@ -100,9 +100,9 @@ export default function CourseTable({ onAddCourse, onEditCourse }) {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [publishTarget, setPublishTarget] = useState(null);
 
-  useEffect(() => {
-    dispatch(fetchTutorCourses());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchTutorCourses());
+  // }, [dispatch]);
 
   // Auto-dismiss success
   useEffect(() => {

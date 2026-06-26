@@ -2,9 +2,9 @@ import express from "express";
 const router = express.Router();
 import multer from "multer";
 import cloudinary from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
+import CloudinaryStorage from "multer-storage-cloudinary";
 
-import { submitApplication, getApplications, getMyApplication } from "../controllers/tutor.controller.js";
+import { submitApplication, getApplications, getMyApplication, completeOnboarding } from "../controllers/tutor.controller.js";
 import { protectUser } from "../middlewares/protectUser.js";
 import { protectAdmin } from "../middlewares/protectAdmin.js"
 
@@ -41,8 +41,10 @@ const upload = multer({
 
 
 
-router.get('/my-application', protectUser, getMyApplication);
+router.get("/my-application", protectUser, getMyApplication);
 router.post("/tutor-application", protectUser, upload.single('photo'), submitApplication);
+
+router.patch("/complete-onboarding", protectUser, completeOnboarding);
 
 
 

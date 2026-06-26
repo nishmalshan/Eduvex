@@ -24,6 +24,14 @@ export const findUserByGoogleId = async (googleId) => {
     }
 }
 
+export const findUserByFacebookId = async (facebookId) => {
+    try {
+        return await User.findOne({ facebookId: String(facebookId) });
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const findUserById = async (id) => {
     try {
         const user = await User.findById(id).select("-password");
