@@ -40,17 +40,14 @@ export const checkAuth = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
- console.log(user,'user')
+    
     // For instructors, attach onboardingCompleted from their TutorProfile
     let onboardingCompleted = null;
     if (user.role === "instructor") {
       const tutorProfile = await findTutorProfileByUserId(user._id);
-      console.log('dfsf')
-      console.log(tutorProfile,'tutor')
       onboardingCompleted = tutorProfile?.onboardingCompleted ?? false;
     }
     
- console.log(onboardingCompleted,'onboardingCompleted')
     res.json({
       user: {
         id: user._id,
@@ -112,7 +109,7 @@ const redirectWithToken = (res, user, token) => {
         sameSite: "strict",
         maxAge:   7 * 24 * 60 * 60 * 1000
     });
-console.log('5555555555555555555555555')
+    
     res.redirect(
         `http://localhost:5173/oauth-success?token=${token}&id=${user._id}&name=${user.fullName}&email=${user.email}&isBlocked=${user.isBlocked}`
     );
@@ -124,13 +121,9 @@ export const googleAuthCallback = async (req, res) => {
     try {
         const { id: googleId, displayName: fullName, emails, provider } = req.user;
         const email = emails[0].value;
-
-        console.log(req.user, 'google profile');
         
-
         const { user } = await OAuthService({ provider, googleId, fullName, email });
 
-        
         // Generate JWT
         const token = generateToken(user._id);
         redirectWithToken(res, user, token);
@@ -143,9 +136,7 @@ export const googleAuthCallback = async (req, res) => {
 
 export const facebookAuthCallback = async (req, res) => {
     try {
-        console.log('0000000000000000000')
         const { id: facebookId, displayName: fullName, emails, provider } = req.user;
-        console.log(req.user, 'req.user 2222222222222222222222222222222')
         // No email — redirect to frontend to collect it
         if (!emails || emails.length === 0) {
             const encodedName = encodeURIComponent(fullName);
@@ -156,9 +147,8 @@ export const facebookAuthCallback = async (req, res) => {
 
         // Email is in emails array (confirmed working from your log)
         const email = emails[0].value;
-        console.log(email, 'email 33333333333333333')
+        
         const { user } = await OAuthService({ provider, facebookId, fullName, email });
-        console.log(user, 'user 4444444444444444444')
 
         const token = generateToken(user._id);
         redirectWithToken(res, user, token);

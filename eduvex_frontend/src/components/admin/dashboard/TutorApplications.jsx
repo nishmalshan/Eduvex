@@ -25,7 +25,7 @@ const SkeletonRow = () => (
 
 // ── Detail popup ──────────────────────────────────────────────────────────
 const DetailPopup = ({ app, onClose, onApprove, onReject, actionLoading }) => {
-  console.log(app, 'app')
+  
   if (!app) return null;
   const isActing = actionLoading === app._id;
 

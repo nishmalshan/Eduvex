@@ -1,5 +1,4 @@
-import dotenv from "dotenv"
-dotenv.config()
+import "./config/env.js";
 import "./config/passport.js";
 
 import express from "express"

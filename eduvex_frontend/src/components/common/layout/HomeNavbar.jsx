@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Menu, X, Bell, ShoppingCart, User, LogOut, ChevronDown, Glasses } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../../redux/features/authSlice';
 
 const HomeNavbar = () => {
@@ -9,6 +9,7 @@ const HomeNavbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [hasNotification, setHasNotification] = useState(true);
   const profileRef = useRef(null);
+  const user = useSelector((state) => state.auth.user);
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -29,10 +30,6 @@ const HomeNavbar = () => {
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
-
-    // if (logoutUser.fulfilled.match) {
-      
-    // }
     navigate("/login")
   }
 
@@ -49,11 +46,11 @@ const HomeNavbar = () => {
           {/* Desktop Search Bar */}
           <div className="hidden md:flex relative flex-1 max-w-md">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap='round' strokeLinejoin='round' className="lucide lucide-search absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.3-4.3"></path>
             </svg>
             <input type="text" name='search' className='flex h-10 w-full rounded-md border px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm pl-9 bg-blue-50 border-transparent focus:border-primary focus:bg-card' placeholder='Search courses, topics, instructors...' />
-            </div>
+          </div>
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center space-x-6 text-sm">
@@ -63,9 +60,15 @@ const HomeNavbar = () => {
             <a href="#browse" className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
               Browse
             </a>
-            <a href="/tutor/application" className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
-              Become a Tutor
-            </a>
+            {user?.role === 'instructor' ? (
+              <a href="/tutor/dashboard" className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
+                Instructor
+              </a>
+            ) : (
+              <a href="/tutor/application" className="text-gray-600 hover:text-gray-800 font-medium transition-colors">
+                Become a Tutor
+              </a>
+            )}
           </div>
 
           {/* Desktop Right Icons */}
@@ -92,7 +95,7 @@ const HomeNavbar = () => {
               >
                 {/* Avatar circle */}
                 <span className="w-7 h-7 rounded-full bg-white text-blue-600 flex items-center justify-center font-bold text-sm">
-                  JD
+                  {user && user.fullName ? user.fullName.charAt(0).toUpperCase() : 'U'}
                 </span>
                 <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -175,9 +178,8 @@ const HomeNavbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden transition-all duration-300 ease-in-out ${
-          isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
-        }`}
+        className={`md:hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+          }`}
       >
         <div className="px-4 pt-2 pb-4 space-y-1 bg-white border-t border-gray-200">
           <a

@@ -18,7 +18,6 @@ router.post("/logout", logoutUser)
 // Google OAuth routes
 router.get("/auth/google", passport.authenticate("google", {scope: ["profile", "email"], prompt: "select_account" }));
 router.get("/auth/google/callback", passport.authenticate("google", {
-    // session: false,
     failureRedirect: "/login"
 }),
 googleAuthCallback
@@ -30,7 +29,6 @@ router.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'
 
 // Facebook OAuth callback
 router.get('/auth/facebook/callback', passport.authenticate('facebook', {
-    // session: false,
     failureRedirect: '/login'
 }),
     facebookAuthCallback

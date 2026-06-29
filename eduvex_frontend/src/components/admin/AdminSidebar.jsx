@@ -52,11 +52,9 @@ const AdminSidebar = ({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) =>
     const navigate = useNavigate();
 
   const handleLogout = async () => {
-    console.log('Logout 11111111111')
       const result = await dispatch(logoutAdmin());
   
       if (logoutAdmin.fulfilled.match(result)) {
-        console.log('Logout 44444444444444')
         navigate("/admin/login")
       }
     }

@@ -19,7 +19,7 @@ import AdminLayout from "./components/common/layout/AdminLayout";
 import TutorsList from "./components/admin/dashboard/TutorsList";
 import UsersPage from "./pages/admin/UsersPage";
 import CoursesPage from "./pages/admin/CoursesPage";
-import Tutordashboardguard from "./components/tutor/home/Tutordashboardguard";
+import Tutordashboardguard from "./components/tutor/Tutordashboardguard";
 import CourseTable from "./components/tutor/dashboard/Coursetable";
 import CompleteProfile from "./pages/user/auth/CompleteProfile";
 

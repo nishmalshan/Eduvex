@@ -72,7 +72,6 @@ const Login = () => {
 
   const handleFacebookLogin = () => {
     try {
-      console.log('111111111111111111111111111111')
       window.location.href = "http://localhost:5000/auth/facebook";
     } catch (error) {
       setError("Facebook login failed");

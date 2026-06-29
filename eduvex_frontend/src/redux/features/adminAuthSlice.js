@@ -15,7 +15,6 @@ export const submintAdminLogin = createAsyncThunk(
     async ({ email, password }, { rejectWithValue }) => {
         try {
             const response = await API_URL.post("/admin/login", { email, password });
-            console.log(response.data.admin, 'admin check-auth response')
             return response.data;
         } catch (error) {
             const serverError = error.response?.data;
@@ -30,7 +29,6 @@ export const submintAdminLogin = createAsyncThunk(
 export const logoutAdmin = createAsyncThunk(
     "auth/logoutAdmin",
     async () => {
-        console.log('Logout 22222222222222222')
         await API_URL.post("/admin/logout")
     }
 );
@@ -60,7 +58,6 @@ const adminLoginSlice = createSlice({
                 state.error = null;
             })
             .addCase(submintAdminLogin.fulfilled, (state, action) => {
-                console.log(action.payload, 'aaaaaaaaaaaa')
                 state.loading = false;
                 state.isAuthenticated = true;
                 state.admin = action.payload.admin;

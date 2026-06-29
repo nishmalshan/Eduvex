@@ -1,6 +1,3 @@
-import dotenv from "dotenv"
-dotenv.config()
-
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Strategy as FacebookStrategy } from 'passport-facebook';
@@ -17,7 +14,6 @@ passport.use(
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                console.log(profile,'333333333333333333ee')
 
                 if (!profile.emails) {
                     return done(new Error("Google account has no email"), null);
@@ -46,7 +42,6 @@ passport.use(
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                console.log(profile, 'facebook-profile')
 
                 // Facebook may not return email if user signed up with phone number
                 if (!profile.emails || profile.emails.length === 0) {

@@ -16,10 +16,8 @@ export const fetchMyApplication = createAsyncThunk(
     async (_, { rejectWithValue }) => {
         try {
             const response = await API_URL.get('/tutor/my-application');
-            console.log(response.data, 'my application response')
             return response.data; // { hasApplied: bool, application: {...} | null }
         } catch (error) {
-            console.log(error.response,'slice error')
             if (error.response?.status === 404) {
                 return { hasApplied: false, application: null };
             }
@@ -33,7 +31,6 @@ export const submitTutorApplication = createAsyncThunk(
     'tutor/submitApplication',
     async (formData, { rejectWithValue }) => {
         try {
-            console.log(formData, 'formData')
             const payload = new FormData();
 
             payload.append('fullName', formData.fullName.trim());
@@ -48,7 +45,7 @@ export const submitTutorApplication = createAsyncThunk(
             if (formData.photo) {
                 payload.append('photo', formData.photo);
             }
-            console.log('22222222222222222')
+            
             const response = await API_URL.post('/tutor/tutor-application', payload);
             return response.data;
         } catch (error) {
@@ -68,9 +65,7 @@ export const fetchTutorApplications = createAsyncThunk(
     "tutorApplications/fetchAll",
     async (_, { rejectWithValue }) => {
         try {
-            console.log('2222222222222222')
             const response = await API_URL.get("/admin/tutor-applications");
-            console.log(response.data, 'application response')
             return response.data; // expects { applications: [...] }
         } catch (error) {
             const msg = error.response?.data?.message || "Failed to fetch applications.";

@@ -8,16 +8,13 @@ const OAuthSuccess = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     useEffect(() => {
-        console.log('66666666666666666666666666')
         // Extract the token from the URL
         const params = new URLSearchParams(window.location.search);
-        console.log(params,'params')
         const token = params.get("token");
         const id = params.get("id");
         const name = params.get("name");
         const email = params.get("email");
         const isBlocked = params.get("isBlocked");
-        console.log(params, 'params 77777777777777777777777')
 
 
         const user = {
@@ -26,10 +23,8 @@ const OAuthSuccess = () => {
             email,
             isBlocked
         };
-        console.log(user,'oauth auth user')
 
         if (user && token) {
-            console.log('gggg11111111')
             dispatch(loginSuccess({
                 user,
                 token

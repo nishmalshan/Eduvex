@@ -3,13 +3,10 @@ import TutorProfile from "../models/TutorProfile.js";
 
 export const application = async (applicationData) => {
     try {
-        console.log(applicationData,"fffffffffffffff")
         const newApplication = new TutorApplication(applicationData);
         await newApplication.save();
-        console.log(newApplication, 'newApplication')
         return newApplication;
     } catch (error) {
-        console.log(error.message, 'tutor application error')
         throw error;
     }
 }

@@ -18,7 +18,6 @@ export const getMyApplication = async (req, res) => {
 
 export const submitApplication = async (req, res) => {
     try {
-        console.log('first')
         const {
             fullName,
             bio,
@@ -46,7 +45,7 @@ export const submitApplication = async (req, res) => {
                 message: "Invalid format for skills or categories"
             })
         }
-console.log(req.user, 'req.user')
+        
         const result = await application({
             fullName,
             bio,
@@ -58,7 +57,6 @@ console.log(req.user, 'req.user')
             profilePhotoUrl: req.file?.path || null,
             userId: req.user.id || req.user
         })
-        console.log(result, 'result')
 
         return res.status(201).json({
             success: true,
@@ -102,7 +100,6 @@ export const getApplications = async (req, res) => {
             status: app.status,
             createdAt: app.createdAt,
         }));
-        // console.log(shaped,'shaped')
 
         return res.status(200).json({
             success: true,
@@ -123,7 +120,6 @@ export const approveApplication = async (req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-        console.log(session,'session')
         const { id } = req.params;
 
         const existing = await getApplicationById(id);
@@ -240,7 +236,7 @@ export const rejectApplication = async (req, res) => {
 export const completeOnboarding = async (req, res) => {
   try {
     const profile = await completeTutorOnboarding(req.user.id);
-    console.log(profile,'profile')
+    
     if (!profile) {
       return res.status(404).json({ success: false, message: "Tutor profile not found." });
     }
@@ -255,7 +251,6 @@ export const completeOnboarding = async (req, res) => {
 // GET /admin/list-tutors
 export const getApprovedTutors = async (req, res) => {
     try {
-        console.log('111111111111')
         const tutors = await findApprovedTutors();
         const formatted = tutors.map((t) => ({
             _id:      t._id,
@@ -267,7 +262,6 @@ export const getApprovedTutors = async (req, res) => {
             isBlocked: t.userId?.isBlocked ?? true,
             joined:   t.createdAt,
         }));
-        // console.log(formatted, 'formatted tutors')
 
         return res.status(200).json({ tutors: formatted });
     } catch (error) {
@@ -285,7 +279,7 @@ export const toggleTutorStatus = async (req, res) => {
         if (!updated) {
             return res.status(404).json({ message: "Tutor not found." });
         }
-console.log(updated,'updated')
+        
         const tutor = {
             _id:      updated._id,
             fullName: updated.fullName,

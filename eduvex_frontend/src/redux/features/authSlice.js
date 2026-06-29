@@ -17,7 +17,6 @@ export const registerUser = createAsyncThunk(
     async (formData, thunkAPI) => {
         try {
             const response = await API_URL.post("/signup", formData);
-            console.log(response.data, 'register slice response')
             return response.data
         } catch (error) {
             return thunkAPI.rejectWithValue(
@@ -32,8 +31,7 @@ export const loginUser = createAsyncThunk(
     "auth/loginUser",
     async (formData, { rejectWithValue }) => {
         try {
-            const response = await API_URL.post("/login", formData)
-            console.log(response.data, 'login slice response')
+            const response = await API_URL.post("/login", formData);
             return response.data
         } catch (error) {
             return rejectWithValue(
@@ -98,7 +96,6 @@ const authSlice = createSlice({
             })
 
             .addCase(registerUser.fulfilled, (state, action) => {
-                console.log(action, 'register action')
                 state.loading = false
                 state.user = action.payload.user
                 state.token = action.payload.token || null

@@ -1,13 +1,13 @@
 // src/pages/user/tutor/TutorApplicationPage.jsx
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchMyApplication } from '../../../redux/features/tutorApplicationSlice';
-import TutorApplicationForm from '../TutorApplicationForm';
-import ApplicationUnderReview from '../../user/ApplicationUnderReview';
-import Loader from '../../common/layout/Loader';
-import CourseTable from '../dashboard/Coursetable';
-import TutorOnboarding from './Tutoronboarding';
-import { selectOnboardingCompleted } from '../../../redux/features/courseSlice';
+import { fetchMyApplication } from '../../redux/features/tutorApplicationSlice';
+import TutorApplicationForm from './TutorApplicationForm';
+import ApplicationUnderReview from './ApplicationUnderReview';
+import Loader from '../common/layout/Loader';
+import CourseTable from './dashboard/Coursetable';
+import TutorOnboarding from './home/Tutoronboarding';
+import { selectOnboardingCompleted } from '../../redux/features/courseSlice';
 
 const TutorApplicationPage = () => {
   const dispatch = useDispatch();

@@ -4,7 +4,6 @@ import { findUserById, findUserByIdAndUpdate, getUsers } from "../repositories/u
 export const getAllUsers = async (req, res) => {
     try {
         const users = await getUsers();
-        console.log(users, 'getAllUsers result')
         return res.status(200).json({ success: true, users });
 
     } catch (error) {

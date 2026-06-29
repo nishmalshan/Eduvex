@@ -13,7 +13,6 @@ const TutorsList = () => {
     const [page, setPage]     = useState(1);
 
     useEffect(() => {
-      console.log('111111111111111')
         dispatch(fetchApprovedTutors());
     }, [dispatch]);
 

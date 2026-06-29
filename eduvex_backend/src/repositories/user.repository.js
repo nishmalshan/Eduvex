@@ -17,7 +17,6 @@ export const createUser = async (userData) => {
 export const findUserByGoogleId = async (googleId) => {
     try {
         const user = await User.findOne({ googleId: String(googleId) });
-        console.log(user, 'findUserByGoogleId result')
         return user;
     } catch (error) {
         throw error;
